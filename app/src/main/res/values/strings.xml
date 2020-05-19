@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">LabCoC</string>
+    <string name="title_activity_select">selectActivity</string>
+</resources>
