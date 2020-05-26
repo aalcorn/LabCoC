@@ -1,6 +1,8 @@
 package com.example.labcoc;
 
+import android.app.AlertDialog;
 import android.app.Application;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -39,6 +41,7 @@ public class selectActivity extends AppCompatActivity {
 
     Button button;
     Button uploadButton;
+    Button delButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,30 +54,37 @@ public class selectActivity extends AppCompatActivity {
 
         //populate list with all previous events
         for(int i = 1; i <= jArr.length(); i++) {
-            Button myButton = new Button(selectActivity.this);
             try {
-                myButton.setText(jArr.getJSONObject(i-1).getString("name"));
-            } catch (JSONException e) {
-                e.printStackTrace();
-                myButton.setText("Event #" + i);
-            }
-            myButton.setId(i);
-            final int id_ = myButton.getId();
+                if(!jArr.getJSONObject(i-1).has("deleted")) {
+                    Button myButton = new Button(selectActivity.this);
+                    try {
+                        myButton.setText(jArr.getJSONObject(i-1).getString("name"));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        myButton.setText("Event #" + i);
+                    }
+                    myButton.setId(i);
+                    final int id_ = myButton.getId();
 
 
-            LinearLayout layout = findViewById(R.id.scrollLayout);
-            layout.addView(myButton);
+                    LinearLayout layout = findViewById(R.id.scrollLayout);
+                    layout.addView(myButton);
 
-            myButton.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View view) {
-                    Intent intent = new Intent(selectActivity.this, MainActivity.class);
-                    intent.putExtra("eventID", id_);
-                    ((MyApplication) getApplication()).saveJson();
-                    startActivity(intent);
+                    myButton.setOnClickListener(new View.OnClickListener() {
+                        public void onClick(View view) {
+                            Intent intent = new Intent(selectActivity.this, MainActivity.class);
+                            intent.putExtra("eventID", id_);
+                            ((MyApplication) getApplication()).saveJson();
+                            startActivity(intent);
+                        }
+                    });
+
                 }
-            });
-
+                } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
+
 
 
         button = findViewById(R.id.button);
@@ -144,6 +154,30 @@ public class selectActivity extends AppCompatActivity {
                     }
                 });
                 thread.start();
+            }
+        });
+
+        delButton = findViewById(R.id.selectDelButton);
+        delButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //pop up a window that asks if they're sure they want to delete; if they are, add delete flag to the sample
+                new AlertDialog.Builder(selectActivity.this)
+                        .setTitle("")
+                        .setMessage("WARNING: Delete all Sampling Events?")
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Toast.makeText(selectActivity.this,"Deleted", Toast.LENGTH_LONG).show();
+                                ((MyApplication) getApplication()).clearJson();
+                                System.out.println(((MyApplication) getApplication()).mainArray.toString() + " is the array");
+                                Intent intent = new Intent(selectActivity.this, selectActivity.class);
+                                startActivity(intent);
+                            }
+                        })
+
+                        .setNegativeButton(android.R.string.no, null).show();
             }
         });
     }

@@ -36,4 +36,13 @@ public class MyApplication extends Application {
             e.printStackTrace();
         }
     }
+
+    public void clearJson() {
+        mainArray = new JSONArray();
+        saveJson();
+    }
+
+    public String toString() {
+        return mainArray.toString();
+    }
 }

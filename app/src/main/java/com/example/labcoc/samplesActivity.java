@@ -48,23 +48,30 @@ public class samplesActivity extends AppCompatActivity {
         //populate list with all previous samples (This will be done by going to the index of the sampling event and looking at the length of the samples array)
 
         for(int i = 1; i <= samplesCount; i++) {
-            Button myButton = new Button(samplesActivity.this);
-            myButton.setText("Sample #"+ i);
-            myButton.setId(i);
-            final int id_ = myButton.getId();
+            try {
+                if(!jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(i-1).has("deleted")) {
+                    Button myButton = new Button(samplesActivity.this);
+                    myButton.setText("Sample #"+ i);
+                    myButton.setId(i);
+                    final int id_ = myButton.getId();
 
-            LinearLayout layout = findViewById(R.id.scrollLayout);
-            layout.addView(myButton);
+                    LinearLayout layout = findViewById(R.id.scrollLayout);
+                    layout.addView(myButton);
 
-            myButton.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View view) {
-                    Intent intent = new Intent(samplesActivity.this, sampleEditActivity.class);
-                    intent.putExtra("eventID", eventID);
-                    intent.putExtra("sampleID", id_);
-                    ((MyApplication) getApplication()).saveJson();
-                    startActivity(intent);
+                    myButton.setOnClickListener(new View.OnClickListener() {
+                        public void onClick(View view) {
+                            Intent intent = new Intent(samplesActivity.this, sampleEditActivity.class);
+                            intent.putExtra("eventID", eventID);
+                            intent.putExtra("sampleID", id_);
+                            ((MyApplication) getApplication()).saveJson();
+                            startActivity(intent);
+                        }
+                    });
                 }
-            });
+            } catch (JSONException e) {
+                e.printStackTrace();
+                System.out.println("ERROR");
+            }
 
         }
 

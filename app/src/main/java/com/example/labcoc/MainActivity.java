@@ -1,5 +1,7 @@
 package com.example.labcoc;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -8,10 +10,15 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -27,6 +34,8 @@ public class MainActivity extends AppCompatActivity {
     TextView sampTypeText;
     Button button;
     Button editButton;
+    Button delButton;
+
     boolean edited = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +53,9 @@ public class MainActivity extends AppCompatActivity {
         sampTypeText = findViewById(R.id.sampTypeText);
         button = findViewById(R.id.confButton);
         button.setEnabled(false);
+        delButton = findViewById(R.id.mainDelButton);
+        delButton.setEnabled(false);
+        delButton.setVisibility(View.INVISIBLE);
 
         //if the event has previous data, fill the textboxes with it and don't allow them to edit it unless they hit edit
 
@@ -87,13 +99,14 @@ public class MainActivity extends AppCompatActivity {
                 if(edited == false) {
                     sampName = sampNameText.getText().toString();
                     samplerName = samplerNameText.getText().toString();
-                    date = dateText.getText().toString();
                     sampType = sampTypeText.getText().toString();
+
+                    Date dateobj = new Date();
 
                     try {
                         jArr.getJSONObject(eventID).put("name", sampName);
                         jArr.getJSONObject(eventID).put("samplerName", samplerName);
-                        jArr.getJSONObject(eventID).put("samplingDate", date);
+                        jArr.getJSONObject(eventID).put("samplingDate", dateobj);
                         jArr.getJSONObject(eventID).put("type", sampType);
                         if (!jArr.getJSONObject(eventID).has("samples") ) {
                             System.out.println("adding samples array");
@@ -129,6 +142,36 @@ public class MainActivity extends AppCompatActivity {
             editButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    delButton.setEnabled(true);
+                    delButton.setVisibility(View.VISIBLE);
+
+                    delButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            //pop up a window that asks if they're sure they want to delete; if they are, add delete flag to the sample
+                            new AlertDialog.Builder(MainActivity.this)
+                                    .setTitle("")
+                                    .setMessage("Delete this Event?")
+                                    .setIcon(android.R.drawable.ic_dialog_alert)
+                                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            Toast.makeText(MainActivity.this,"Deleted", Toast.LENGTH_LONG).show();
+                                            try {
+                                                jArr.getJSONObject(eventID).put("deleted", true);
+                                                Intent intent = new Intent(MainActivity.this, selectActivity.class);
+                                                ((MyApplication) getApplication()).saveJson();
+                                                startActivity(intent);
+                                            } catch (JSONException e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    })
+
+                                    .setNegativeButton(android.R.string.no, null).show();
+                        }
+                    });
+
                     editButton.setText("Confirm");
 
                     sampNameText.setFocusable(true);
@@ -145,15 +188,17 @@ public class MainActivity extends AppCompatActivity {
                         public void onClick(View v) {
                             sampName = sampNameText.getText().toString();
                             samplerName = samplerNameText.getText().toString();
-                            date = dateText.getText().toString();
                             sampType = sampTypeText.getText().toString();
+
+                            DateFormat df = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
+                            Date dateobj = new Date();
+                            System.out.println(df.format(dateobj));
 
                             try {
                                 jArr.getJSONObject(eventID).put("name", sampName);
                                 jArr.getJSONObject(eventID).put("samplerName", samplerName);
-                                jArr.getJSONObject(eventID).put("samplingDate", date);
                                 jArr.getJSONObject(eventID).put("type", sampType);
-                                jArr.getJSONObject(eventID).put("editDate", "placeholder");
+                                jArr.getJSONObject(eventID).put("editDate", dateobj);
 
                                 if (!jArr.getJSONObject(eventID).has("samples") ) {
                                     System.out.println("adding samples array");

@@ -1,5 +1,7 @@
 package com.example.labcoc;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -8,9 +10,12 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+
+import java.util.Date;
 
 public class sampleEditActivity extends AppCompatActivity {
 
@@ -19,8 +24,8 @@ public class sampleEditActivity extends AppCompatActivity {
     TextView volText;
     Button button;
     Button backButton;
+    Button delButton;
 
-    String sampleId; //the sample ID the user enters
     String hotCold;
     String vol;
     int eventID;
@@ -38,7 +43,7 @@ public class sampleEditActivity extends AppCompatActivity {
         final JSONArray jArr = ((MyApplication) getApplication()).mainArray;
         System.out.println(jArr.toString());
 
-        sampleIdText = findViewById(R.id.SampleIdText);
+        sampleIdText = findViewById(R.id.SampleLocText);
         hotColdText = findViewById(R.id.hotColdText);
         volText = findViewById(R.id.volText);
 
@@ -66,7 +71,11 @@ public class sampleEditActivity extends AppCompatActivity {
         hotColdText.addTextChangedListener(textWatcher);
         volText.addTextChangedListener(textWatcher);
 
+        delButton = findViewById(R.id.sampleDeleteButton);
         button = findViewById(R.id.sampConfButton);
+
+        delButton.setVisibility(View.INVISIBLE);
+        delButton.setEnabled(false);
 
         if(edited) {
             button.setText("EDIT");
@@ -79,21 +88,25 @@ public class sampleEditActivity extends AppCompatActivity {
                 //add sample params to array and go back to sampling event page corresponding to this sample
 
                 if(!edited) {
-                    sampleId = sampleIdText.getText().toString();
+
                     hotCold = hotColdText.getText().toString();
                     vol = volText.getText().toString();
 
+                    Date dateObj = new Date();
+
                     try {
-                        jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("sampleID", sampleId);
+                        jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("sampleID", sID);
                         jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("temp", hotCold);
                         jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("volume", vol);
+                        jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("sampleDate", dateObj);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
 
 
                     System.out.println(jArr.toString());
-                    Intent intent = new Intent(sampleEditActivity.this, selectActivity.class);
+                    Intent intent = new Intent(sampleEditActivity.this, samplesActivity.class);
+                    intent.putExtra("eventID", eventID);
                     ((MyApplication) getApplication()).saveJson();
                     startActivity(intent);
                 }
@@ -111,32 +124,64 @@ public class sampleEditActivity extends AppCompatActivity {
                         @Override
                         public void onClick(View v) {
 
-                            sampleId = sampleIdText.getText().toString();
+
                             hotCold = hotColdText.getText().toString();
                             vol = volText.getText().toString();
 
+                            Date dateobj = new Date();
+
                             try {
-                                jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("sampleID", sampleId);
+                                jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("sampleID", sID);
                                 jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("temp", hotCold);
                                 jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("volume", vol);
-                                if(!jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).has("editDate")) {
-                                    jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("editDate", "placeholder");
-                                }
-                                else {
-                                    jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("editDate", "placeholder2");
-                                }
+                                jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("editDate", dateobj);
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
 
 
                             System.out.println(jArr.toString());
-                            Intent intent = new Intent(sampleEditActivity.this, selectActivity.class);
+                            Intent intent = new Intent(sampleEditActivity.this, samplesActivity.class);
+                            intent.putExtra("eventID", eventID);
                             ((MyApplication) getApplication()).saveJson();
                             startActivity(intent);
 
                         }
                     });
+
+                    //activation of delete button here
+                    delButton.setEnabled(true);
+                    delButton.setVisibility(View.VISIBLE);
+
+                    delButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            //pop up a window that asks if they're sure they want to delete; if they are, add delete flag to the sample
+                            new AlertDialog.Builder(sampleEditActivity.this)
+                                    .setTitle("")
+                                    .setMessage("Delete this sample?")
+                                    .setIcon(android.R.drawable.ic_dialog_alert)
+                                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            Toast.makeText(sampleEditActivity.this,"Deleted", Toast.LENGTH_LONG).show();
+                                            try {
+                                                jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("deleted", true);
+                                                Intent intent = new Intent(sampleEditActivity.this, samplesActivity.class);
+                                                intent.putExtra("eventID", eventID);
+                                                ((MyApplication) getApplication()).saveJson();
+                                                startActivity(intent);
+                                            } catch (JSONException e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    })
+
+                                    .setNegativeButton(android.R.string.no, null).show();
+                        }
+                    });
+
+
                 }
 
             }
@@ -163,12 +208,10 @@ public class sampleEditActivity extends AppCompatActivity {
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
-            sampleId = sampleIdText.getText().toString();
             hotCold = hotColdText.getText().toString();
             vol = volText.getText().toString();
 
-
-            button.setEnabled(!sampleId.isEmpty() && !hotCold.isEmpty() && !vol.isEmpty());
+            button.setEnabled(!hotCold.isEmpty() && !vol.isEmpty());
         }
 
         @Override
