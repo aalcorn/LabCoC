@@ -14,13 +14,13 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_marginBottom="98dp"
         android:ems="10"
         android:hint="Sampler Name"
         android:inputType="text"
-        app:layout_constraintBottom_toTopOf="@+id/dateBox"
+        app:layout_constraintBottom_toTopOf="@+id/confButton"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/nameBox"
@@ -37,19 +37,8 @@
         app:layout_constraintBottom_toTopOf="@+id/samplerNameBox"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <EditText
-        android:id="@+id/dateBox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="408dp"
-        android:ems="10"
-        android:hint="Sampling Date"
-        android:inputType="datetime"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.633" />
 
     <Button
         android:id="@+id/confButton"
@@ -61,20 +50,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent" />
-
-    <EditText
-        android:id="@+id/sampTypeText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:ems="10"
-        android:hint="Sample Type"
-        android:inputType="text"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/dateBox" />
 
     <Button
         android:id="@+id/mainEditButton"
@@ -97,5 +72,27 @@
         android:text="Delete"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <RadioGroup
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/confButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/samplerNameBox">
+
+        <RadioButton
+            android:id="@+id/hpcButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="HPC" />
+
+        <RadioButton
+            android:id="@+id/legionButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Legionella" />
+    </RadioGroup>
 
 </android.support.constraint.ConstraintLayout>

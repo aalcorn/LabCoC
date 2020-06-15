@@ -9,6 +9,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,8 +31,8 @@ public class MainActivity extends AppCompatActivity {
 
     TextView sampNameText;
     TextView samplerNameText;
-    TextView dateText;
-    TextView sampTypeText;
+    RadioButton hpcButton;
+    RadioButton legionellaButton;
     Button button;
     Button editButton;
     Button delButton;
@@ -47,10 +48,10 @@ public class MainActivity extends AppCompatActivity {
         final JSONArray jArr = ((MyApplication) getApplication()).mainArray;
 
 
+        hpcButton = findViewById(R.id.hpcButton);
+        legionellaButton = findViewById(R.id.legionButton);
         sampNameText = findViewById(R.id.nameBox);
         samplerNameText = findViewById(R.id.samplerNameBox);
-        dateText = findViewById(R.id.dateBox);
-        sampTypeText = findViewById(R.id.sampTypeText);
         button = findViewById(R.id.confButton);
         button.setEnabled(false);
         delButton = findViewById(R.id.mainDelButton);
@@ -70,23 +71,24 @@ public class MainActivity extends AppCompatActivity {
                 edited = true;
                 samplerNameText.setFocusable(false);
             }
-            if(jArr.getJSONObject(eventID).has("samplingDate")) {
-                dateText.setText(jArr.getJSONObject(eventID).getString("samplingDate"));
-                edited = true;
-                dateText.setFocusable(false);
-            }
+
+            //TODO change code to disable buttons and activate the correct button.
             if(jArr.getJSONObject(eventID).has("type")) {
-                sampTypeText.setText(jArr.getJSONObject(eventID).getString("type"));
+                if(jArr.getJSONObject(eventID).get("type").equals("hpc")) {
+                    hpcButton.setChecked(true);
+                    legionellaButton.setEnabled(false);
+                }
+                else {
+                    legionellaButton.setChecked(true);
+                    hpcButton.setEnabled(false);
+                }
                 edited = true;
-                sampTypeText.setFocusable(false);
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
         sampNameText.addTextChangedListener(textWatcher);
         samplerNameText.addTextChangedListener(textWatcher);
-        dateText.addTextChangedListener(textWatcher);
-        sampTypeText.addTextChangedListener(textWatcher);
 
         if(edited) {
             button.setText("View Samples");
@@ -99,7 +101,12 @@ public class MainActivity extends AppCompatActivity {
                 if(edited == false) {
                     sampName = sampNameText.getText().toString();
                     samplerName = samplerNameText.getText().toString();
-                    sampType = sampTypeText.getText().toString();
+                    if (hpcButton.isChecked()) {
+                        sampType = "hpc";
+                    }
+                    else {
+                        sampType = "legionella";
+                    }
 
                     Date dateobj = new Date();
 
@@ -123,6 +130,7 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(intent);
                 }
                 else {
+                    //Says view samples, takes them to see the samples for that event
                     Intent intent = new Intent(MainActivity.this, samplesActivity.class);
                     intent.putExtra("eventID", eventID);
                     ((MyApplication) getApplication()).saveJson();
@@ -178,21 +186,22 @@ public class MainActivity extends AppCompatActivity {
                     sampNameText.setFocusableInTouchMode(true);
                     samplerNameText.setFocusable(true);
                     samplerNameText.setFocusableInTouchMode(true);
-                    dateText.setFocusable(true);
-                    dateText.setFocusableInTouchMode(true);
-                    sampTypeText.setFocusable(true);
-                    sampTypeText.setFocusableInTouchMode(true);
+                    hpcButton.setEnabled(true);
+                    legionellaButton.setEnabled(true);
 
                     editButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             sampName = sampNameText.getText().toString();
                             samplerName = samplerNameText.getText().toString();
-                            sampType = sampTypeText.getText().toString();
+                            if (hpcButton.isChecked()) {
+                                sampType = "hpc";
+                            }
+                            else {
+                                sampType = "legionella";
+                            }
 
-                            DateFormat df = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
                             Date dateobj = new Date();
-                            System.out.println(df.format(dateobj));
 
                             try {
                                 jArr.getJSONObject(eventID).put("name", sampName);
@@ -220,6 +229,31 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+        hpcButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sampName = sampNameText.getText().toString();
+                samplerName = samplerNameText.getText().toString();
+
+                System.out.println(hpcButton.isChecked());
+                System.out.println(legionellaButton.isChecked());
+
+                button.setEnabled(!sampName.isEmpty() && !samplerName.isEmpty() && (hpcButton.isChecked() || legionellaButton.isChecked()));
+            }
+        });
+
+        legionellaButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sampName = sampNameText.getText().toString();
+                samplerName = samplerNameText.getText().toString();
+
+                System.out.println(hpcButton.isChecked());
+                System.out.println(legionellaButton.isChecked());
+
+                button.setEnabled(!sampName.isEmpty() && !samplerName.isEmpty() && (hpcButton.isChecked() || legionellaButton.isChecked()));
+            }
+        });
 
     }
 
@@ -233,11 +267,9 @@ public class MainActivity extends AppCompatActivity {
         public void onTextChanged(CharSequence s, int start, int before, int count) {
             sampName = sampNameText.getText().toString();
             samplerName = samplerNameText.getText().toString();
-            date = dateText.getText().toString();
-            sampType = sampTypeText.getText().toString();
 
 
-            button.setEnabled(!sampName.isEmpty() && !samplerName.isEmpty() && !date.isEmpty() && !sampType.isEmpty());
+            button.setEnabled(!sampName.isEmpty() && !samplerName.isEmpty() && (hpcButton.isChecked() || legionellaButton.isChecked()));
         }
 
         @Override

@@ -42,6 +42,7 @@ public class selectActivity extends AppCompatActivity {
     Button button;
     Button uploadButton;
     Button delButton;
+    Button downButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -178,6 +179,14 @@ public class selectActivity extends AppCompatActivity {
                         })
 
                         .setNegativeButton(android.R.string.no, null).show();
+            }
+        });
+
+        downButton = findViewById(R.id.DownloadButton);
+        downButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(selectActivity.this, "WIP", Toast.LENGTH_LONG).show();
             }
         });
     }
