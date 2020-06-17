@@ -129,10 +129,9 @@ public class selectActivity extends AppCompatActivity {
         uploadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //get signature
                 
                 //do a POST to josh's server
-                /*Thread thread = new Thread(new Runnable() {
+                Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
                         URL url = null;
@@ -165,7 +164,7 @@ public class selectActivity extends AppCompatActivity {
                         }
                     }
                 });
-                thread.start();*/
+                thread.start();
             }
         });
 
