@@ -2,9 +2,9 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_gravity="center"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_gravity="center"
     tools:context=".MainActivity">
 
     <EditText
@@ -19,7 +19,6 @@
         android:inputType="text"
         app:layout_constraintBottom_toTopOf="@+id/confButton"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
@@ -36,7 +35,6 @@
         android:inputType="text"
         app:layout_constraintBottom_toTopOf="@+id/samplerNameBox"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.633" />
 
@@ -74,6 +72,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <RadioGroup
+        android:id="@+id/radioGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -94,5 +93,28 @@
             android:layout_height="wrap_content"
             android:text="Legionella" />
     </RadioGroup>
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:text="Sampling Event Name:"
+        android:textSize="18sp"
+        app:layout_constraintBaseline_toBaselineOf="@+id/nameBox"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="64dp"
+        android:layout_marginRight="64dp"
+        android:text="Sampler Name:"
+        android:textSize="18sp"
+        app:layout_constraintBaseline_toBaselineOf="@+id/samplerNameBox"
+        app:layout_constraintEnd_toStartOf="@+id/samplerNameBox"
+        app:layout_constraintStart_toStartOf="@+id/textView2" />
 
 </android.support.constraint.ConstraintLayout>

@@ -72,7 +72,6 @@ public class MainActivity extends AppCompatActivity {
                 samplerNameText.setFocusable(false);
             }
 
-            //TODO change code to disable buttons and activate the correct button.
             if(jArr.getJSONObject(eventID).has("type")) {
                 if(jArr.getJSONObject(eventID).get("type").equals("hpc")) {
                     hpcButton.setChecked(true);
@@ -90,15 +89,23 @@ public class MainActivity extends AppCompatActivity {
         sampNameText.addTextChangedListener(textWatcher);
         samplerNameText.addTextChangedListener(textWatcher);
 
-        if(edited) {
-            button.setText("View Samples");
-            button.setEnabled(true);
+        try {
+            if (edited && !jArr.getJSONObject(eventID).has("signature")) {
+                button.setText("Sign For Samples");
+                button.setEnabled(true);
+            }
+            else if(edited) {
+                button.setText("View Samples");
+                button.setEnabled(true);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(edited == false) {
+                if(!edited) {
                     sampName = sampNameText.getText().toString();
                     samplerName = samplerNameText.getText().toString();
                     if (hpcButton.isChecked()) {
@@ -124,17 +131,32 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     //intent that passes ID to page where user can create samples
-                    Intent intent = new Intent(MainActivity.this, samplesActivity.class);
-                    intent.putExtra("eventID", eventID);
+                    //TODO: make them sign for event
+                    Intent intent = new Intent(MainActivity.this, signActivity.class);
+                    intent.putExtra("eventID", eventID)
+                            .putExtra("editState", edited);
                     ((MyApplication) getApplication()).saveJson();
                     startActivity(intent);
                 }
                 else {
-                    //Says view samples, takes them to see the samples for that event
-                    Intent intent = new Intent(MainActivity.this, samplesActivity.class);
-                    intent.putExtra("eventID", eventID);
-                    ((MyApplication) getApplication()).saveJson();
-                    startActivity(intent);
+                    try {
+                        if (edited && !jArr.getJSONObject(eventID).has("signature")) {
+                            Intent intent = new Intent(MainActivity.this, signActivity.class);
+                            intent.putExtra("eventID", eventID)
+                                    .putExtra("editState", edited);
+                            ((MyApplication) getApplication()).saveJson();
+                            startActivity(intent);
+                        }
+                        else {
+                            //Says view samples, takes them to see the samples for that event
+                            Intent intent = new Intent(MainActivity.this, samplesActivity.class);
+                            intent.putExtra("eventID", eventID);
+                            ((MyApplication) getApplication()).saveJson();
+                            startActivity(intent);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
 
 
@@ -216,8 +238,10 @@ public class MainActivity extends AppCompatActivity {
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
-                            Intent intent = new Intent(MainActivity.this, samplesActivity.class);
-                            intent.putExtra("eventID", eventID);
+                            //TODO send to sign activity
+                            Intent intent = new Intent(MainActivity.this, signActivity.class);
+                            intent.putExtra("eventID", eventID)
+                                    .putExtra("editState", edited);
                             ((MyApplication) getApplication()).saveJson();
                             startActivity(intent);
                         }

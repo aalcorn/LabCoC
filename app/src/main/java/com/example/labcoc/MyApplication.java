@@ -2,10 +2,13 @@
 package com.example.labcoc;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.SharedPreferences;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+
+import java.io.UnsupportedEncodingException;
 
 
 //set: ((MyApplication) this.getApplication()).setVariable(thingToSet);
@@ -44,5 +47,17 @@ public class MyApplication extends Application {
 
     public String toString() {
         return mainArray.toString();
+    }
+
+    public long getSize() {
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS,MODE_PRIVATE);
+        String data = sharedPreferences.getString(TEXT, "");
+        byte[] byteArray = null;
+        try {
+            byteArray = data.getBytes("UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return byteArray.length;
     }
 }

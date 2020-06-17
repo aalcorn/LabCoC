@@ -100,8 +100,17 @@ public class selectActivity extends AppCompatActivity {
                 myButton.setId(jArr.length());
                 final int id_ = myButton.getId();
 
-                LinearLayout layout = findViewById(R.id.scrollLayout);
+                final LinearLayout layout = findViewById(R.id.scrollLayout);
                 layout.addView(myButton);
+
+                final ScrollView scrollView = findViewById(R.id.scrollView);
+
+                scrollView.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        scrollView.fullScroll(scrollView.FOCUS_DOWN);
+                    }
+                });
 
                 myButton.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View view) {
@@ -120,8 +129,10 @@ public class selectActivity extends AppCompatActivity {
         uploadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //get signature
+                
                 //do a POST to josh's server
-                Thread thread = new Thread(new Runnable() {
+                /*Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
                         URL url = null;
@@ -154,7 +165,7 @@ public class selectActivity extends AppCompatActivity {
                         }
                     }
                 });
-                thread.start();
+                thread.start();*/
             }
         });
 
@@ -186,8 +197,12 @@ public class selectActivity extends AppCompatActivity {
         downButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                System.out.println(((MyApplication) getApplication()).getSize());
                 Toast.makeText(selectActivity.this, "WIP", Toast.LENGTH_LONG).show();
             }
         });
+    }
+    public void onBackPressed() {
+        return;
     }
 }

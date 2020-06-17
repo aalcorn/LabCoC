@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import org.json.JSONArray;
@@ -99,6 +100,15 @@ public class samplesActivity extends AppCompatActivity {
                 LinearLayout layout = findViewById(R.id.scrollLayout);
                 layout.addView(myButton);
 
+                final ScrollView scrollView = findViewById(R.id.scrollView);
+
+                scrollView.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        scrollView.fullScroll(scrollView.FOCUS_DOWN);
+                    }
+                });
+
                 myButton.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View view) {
                         Intent intent = new Intent(samplesActivity.this, sampleEditActivity.class);
@@ -125,5 +135,9 @@ public class samplesActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    public void onBackPressed() {
+        return;
     }
 }

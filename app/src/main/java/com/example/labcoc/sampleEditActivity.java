@@ -372,4 +372,8 @@ public class sampleEditActivity extends AppCompatActivity {
 
         }
     };
+
+    public void onBackPressed() {
+        return;
+    }
 }
