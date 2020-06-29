@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_gravity="center"
-    tools:context=".MainActivity">
+    tools:context=".downloadsShowActivity">
+
 
     <EditText
         android:id="@+id/samplerNameBox"
@@ -14,13 +14,15 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_marginTop="168dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginRight="4dp"
         android:ems="10"
         android:hint="Sampler Name"
         android:inputType="text"
         app:layout_constraintBottom_toTopOf="@+id/confButton"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/nameBox" />
 
     <EditText
         android:id="@+id/nameBox"
@@ -29,46 +31,25 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:layout_marginBottom="8dp"
+        android:layout_marginTop="96dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginRight="4dp"
         android:ems="10"
         android:hint="Sampling Event Name"
         android:inputType="text"
-        app:layout_constraintBottom_toTopOf="@+id/samplerNameBox"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/mainEditButton" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/downSampButton"
+        android:id="@+id/downEventButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:text="confirm and create samples"
+        android:text="Download Event"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
-        android:id="@+id/mainEditButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
-        android:text="Edit"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/mainDelButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="16dp"
-        android:text="Delete"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
     <RadioGroup
         android:id="@+id/radioGroup"
@@ -76,9 +57,10 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/downSampButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/samplerNameBox">
+        app:layout_constraintTop_toBottomOf="@+id/facilityText">
 
         <RadioButton
             android:id="@+id/hpcButton"
@@ -97,8 +79,8 @@
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
         android:text="Sampling Event Name:"
         android:textSize="18sp"
         app:layout_constraintBaseline_toBaselineOf="@+id/nameBox"
@@ -116,35 +98,26 @@
         app:layout_constraintEnd_toStartOf="@+id/samplerNameBox"
         app:layout_constraintStart_toStartOf="@+id/textView2" />
 
-    <android.support.v7.widget.AppCompatImageView
-        android:id="@+id/imageView"
-        android:layout_width="0dp"
-        android:layout_height="150dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/downSampButton"
+    <EditText
+        android:id="@+id/facilityText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:ems="10"
+        android:hint="Facility"
+        android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/radioGroup" />
+        app:layout_constraintTop_toBottomOf="@+id/samplerNameBox" />
 
     <TextView
-        android:id="@+id/eventEditedTextView"
+        android:id="@+id/textView6"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/confButton"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <TextView
-        android:id="@+id/eventCreatedTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/eventEditedTextView"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        android:text="Facility:"
+        android:textSize="18sp"
+        app:layout_constraintBaseline_toBaselineOf="@+id/facilityText"
         app:layout_constraintStart_toStartOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

@@ -138,6 +138,10 @@ public class samplesActivity extends AppCompatActivity {
     }
 
     public void onBackPressed() {
+        Intent intent = new Intent(samplesActivity.this, MainActivity.class);
+        intent.putExtra("eventID", eventID + 1);
+        ((MyApplication) getApplication()).saveJson();
+        startActivity(intent);
         return;
     }
 }

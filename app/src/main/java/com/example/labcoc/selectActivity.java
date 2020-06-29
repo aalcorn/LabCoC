@@ -31,6 +31,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -38,6 +39,8 @@ import java.util.ArrayList;
 import javax.net.ssl.HttpsURLConnection;
 
 public class selectActivity extends AppCompatActivity {
+
+    private HttpURLConnection connection;
 
     Button button;
     Button uploadButton;
@@ -52,6 +55,8 @@ public class selectActivity extends AppCompatActivity {
         ((MyApplication) getApplication()).loadJson();
 
         final JSONArray jArr = ((MyApplication) getApplication()).mainArray;
+
+        System.out.println("jArr: " + jArr.toString());
 
         //populate list with all previous events
         for(int i = 1; i <= jArr.length(); i++) {
@@ -138,10 +143,12 @@ public class selectActivity extends AppCompatActivity {
                         HttpURLConnection connection = null;
                         InputStream stream = null;
                         try {
-                            url =new URL("http://174.126.172.64:3000/sampling");
+                            //url =new URL("http://174.126.172.64:3000/sampling");
+                            url = new URL("http://69.92.212.4/sampling/app");
                             connection = (HttpURLConnection) url.openConnection();
                             connection.setRequestMethod("POST");
                             connection.setDoOutput(true);
+                            connection.setDoInput(true);
 
                             String data = URLEncoder.encode("data", "UTF-8") + "=" + URLEncoder.encode(jArr.toString(), "UTF-8");
 
@@ -157,10 +164,29 @@ public class selectActivity extends AppCompatActivity {
 
                             System.out.println(result);
 
+                            wr.close();
+                            reader.close();
+                            connection.disconnect();
+                            //Toast.makeText(selectActivity.this, "Success!", Toast.LENGTH_SHORT).show();
+
                         } catch (MalformedURLException e) {
                             e.printStackTrace();
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(selectActivity.this,"Bad URL!", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
                         } catch (IOException e) {
                             e.printStackTrace();
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(selectActivity.this,"Failed to connect to URL!", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
                         }
                     }
                 });
@@ -196,12 +222,185 @@ public class selectActivity extends AppCompatActivity {
         downButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                System.out.println(((MyApplication) getApplication()).getSize());
-                Toast.makeText(selectActivity.this, "WIP", Toast.LENGTH_LONG).show();
+                System.out.println("JSON size: " + ((MyApplication) getApplication()).getSize());
+                //Toast.makeText(selectActivity.this, "WIP", Toast.LENGTH_LONG).show();
+                //getJson();
+                getFacilities();
+                Intent intent = new Intent(selectActivity.this, downloadActivity.class);
+                startActivity(intent);
             }
         });
     }
     public void onBackPressed() {
         return;
     }
+
+    private void getJson() {
+        Thread thread = new Thread(new Runnable(){
+            @Override
+            public void run() {
+                try {
+                    BufferedReader reader;
+                    String line;
+                    StringBuffer responseContent = new StringBuffer();
+
+                    try {
+
+                        // Set up and perform get request
+                        URL url = new URL("http://69.92.212.4/sampling/incomplete");
+                        connection = (HttpURLConnection) url.openConnection();
+
+                        connection.setRequestMethod("GET");
+                        connection.setConnectTimeout(10000);
+                        connection.setReadTimeout(10000);
+
+                        int status = connection.getResponseCode();
+
+                        System.out.println("Response code: " + status);
+
+                        if (status> 299) { // Error code
+                            reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(selectActivity.this, "ERROR: Cannot connect to web server. Try again.", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
+                            while((line = reader.readLine()) != null) {
+                                responseContent.append(line);
+                            }
+                            reader.close();
+                        }
+                        else { // Populate responseContent with info from get request
+                            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(selectActivity.this, "Searching...", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
+                            while((line = reader.readLine()) != null) {
+                                responseContent.append(line);
+                            }
+                            reader.close();
+                        }
+
+                        //PARSING RESPONSE CONTENT BELOW
+
+                        //System.out.println("Response: ");
+                        System.out.println(responseContent.toString());
+
+                        System.out.println("Before array created");
+                        JSONObject events = new JSONObject(responseContent.toString());
+                        JSONArray eventsArray = new JSONArray(events.getJSONArray("events").toString());
+                        System.out.println(eventsArray.length());
+                        System.out.println(events.length());
+
+                        ((MyApplication) getApplication()).downloadsArray = eventsArray;
+
+                    } catch (MalformedURLException e) {
+                        e.printStackTrace();
+                    } catch (ProtocolException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } catch (Exception e) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(selectActivity.this, "Failed to connect! Try again.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+
+            }
+        });
+        thread.start();
+    }
+
+    public void getFacilities() {
+        Thread thread = new Thread(new Runnable(){
+            @Override
+            public void run() {
+                try {
+                    BufferedReader reader;
+                    String line;
+                    StringBuffer responseContent = new StringBuffer();
+
+                    try {
+
+                        // Set up and perform get request
+                        URL url = new URL("http://69.92.212.4/facilities/app");
+                        connection = (HttpURLConnection) url.openConnection();
+
+                        connection.setRequestMethod("GET");
+                        connection.setConnectTimeout(10000);
+                        connection.setReadTimeout(10000);
+
+                        int status = connection.getResponseCode();
+
+                        System.out.println("Response code: " + status);
+
+                        if (status> 299) { // Error code
+                            reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(selectActivity.this, "ERROR: Cannot connect to web server. Try again.", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
+                            while((line = reader.readLine()) != null) {
+                                responseContent.append(line);
+                            }
+                            reader.close();
+                        }
+                        else { // Populate responseContent with info from get request
+                            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(selectActivity.this, "Searching...", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
+                            while((line = reader.readLine()) != null) {
+                                responseContent.append(line);
+                            }
+                            reader.close();
+                        }
+
+                        //PARSING RESPONSE CONTENT BELOW
+
+                        //System.out.println("Response: ");
+                        System.out.println(responseContent.toString());
+
+                        System.out.println("Before array created");
+                        JSONObject facilities = new JSONObject(responseContent.toString());
+                        System.out.println("facilities: " + facilities.toString());
+
+                    } catch (MalformedURLException e) {
+                        e.printStackTrace();
+                    } catch (ProtocolException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } catch (Exception e) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(selectActivity.this, "Failed to connect! Try again.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+
+            }
+        });
+        thread.start();
+    }
 }
+

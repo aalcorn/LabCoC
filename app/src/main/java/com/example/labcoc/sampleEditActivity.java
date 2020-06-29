@@ -3,6 +3,7 @@ package com.example.labcoc;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -16,6 +17,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.util.Date;
+
+//TODO: New *comments* field
 
 public class sampleEditActivity extends AppCompatActivity {
 
@@ -33,6 +36,9 @@ public class sampleEditActivity extends AppCompatActivity {
     TextView bioCideTextView;
     TextView phTextView;
     TextView hotColdTextView;
+
+    TextView timeCreated;
+    TextView timeEdited;
 
     Button button;
     Button backButton;
@@ -55,7 +61,7 @@ public class sampleEditActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sample_edit);
+        this.setContentView(R.layout.activity_sample_edit);
 
         eventID = getIntent().getExtras().getInt("eventID");
         sID = getIntent().getExtras().getInt("sampleID") - 1;
@@ -106,8 +112,8 @@ public class sampleEditActivity extends AppCompatActivity {
 
         try {
             //update fields pertaining to both legionella and HPC
-            if(jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).has("sampleLoc")) {
-                sampleLocText.setText(jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).getString("sampleLoc"));
+            if(jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).has("sampleLocation")) {
+                sampleLocText.setText(jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).getString("sampleLocation"));
                 edited = true;
                 sampleLocText.setFocusable(false);
             }
@@ -187,11 +193,11 @@ public class sampleEditActivity extends AppCompatActivity {
                     Date dateObj = new Date();
 
                     try {
-                        jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("sampleLoc", sampleLoc);
+                        jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("sampleLocation", sampleLoc);
                         jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("sampleID", sID);
                         jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("testCode", testCode);
                         jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("volume", vol);
-                        jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("sampleDate", dateObj);
+                        jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("time", dateObj);
                         if (!isHPC) {
                             hotCold = hotColdText.getText().toString();
                             faucetType = faucetTypeText.getText().toString();
@@ -255,11 +261,11 @@ public class sampleEditActivity extends AppCompatActivity {
                             Date dateObj = new Date();
 
                             try {
-                                jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("sampleLoc", sampleLoc);
+                                jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("sampleLocation", sampleLoc);
                                 jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("sampleID", sID);
                                 jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("testCode", testCode);
                                 jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("volume", vol);
-                                jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("editDate", dateObj);
+                                jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("editTime", dateObj);
                                 if (!isHPC) {
                                     hotCold = hotColdText.getText().toString();
                                     faucetType = faucetTypeText.getText().toString();
@@ -336,6 +342,21 @@ public class sampleEditActivity extends AppCompatActivity {
             }
         });
 
+        timeCreated = findViewById(R.id.timeCreatedView);
+        timeEdited = findViewById(R.id.editedView);
+
+        try {
+            if (jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).has("time")) {
+                timeCreated.setText("Time created: " + jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).get("time"));
+            }
+            if (jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).has("editTime")) {
+                timeEdited.setText("Time last edited: " + jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).get("editTime"));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
     }
 
     private TextWatcher textWatcher = new TextWatcher() {
@@ -369,11 +390,24 @@ public class sampleEditActivity extends AppCompatActivity {
 
         @Override
         public void afterTextChanged(Editable s) {
+            if (!phText.getText().toString().isEmpty() && !phText.getText().toString().equals(".")) {
+                Double phDub = Double.parseDouble(phText.getText().toString());
+                if (phDub < 0 || phDub > 14) {
+                    phText.setTextColor(Color.RED);
+                }
+                else {
+                    phText.setTextColor(Color.BLACK);
+                }
+
+            }
 
         }
     };
 
     public void onBackPressed() {
-        return;
+        Intent intent = new Intent(sampleEditActivity.this, samplesActivity.class);
+        intent.putExtra("eventID", eventID);
+        ((MyApplication) getApplication()).saveJson();
+        startActivity(intent);
     }
 }

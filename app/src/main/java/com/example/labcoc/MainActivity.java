@@ -1,14 +1,21 @@
 package com.example.labcoc;
 
+//TODO add facility field
+
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,8 +38,15 @@ public class MainActivity extends AppCompatActivity {
 
     TextView sampNameText;
     TextView samplerNameText;
+
+    TextView createdText;
+    TextView editedText;
+
+    ImageView imageView;
+
     RadioButton hpcButton;
     RadioButton legionellaButton;
+
     Button button;
     Button editButton;
     Button delButton;
@@ -52,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
         legionellaButton = findViewById(R.id.legionButton);
         sampNameText = findViewById(R.id.nameBox);
         samplerNameText = findViewById(R.id.samplerNameBox);
-        button = findViewById(R.id.confButton);
+        button = findViewById(R.id.downSampButton);
         button.setEnabled(false);
         delButton = findViewById(R.id.mainDelButton);
         delButton.setEnabled(false);
@@ -82,6 +96,12 @@ public class MainActivity extends AppCompatActivity {
                     hpcButton.setEnabled(false);
                 }
                 edited = true;
+            }
+            if(jArr.getJSONObject(eventID).has("signature")) {
+                imageView = findViewById(R.id.imageView);
+                Bitmap bitmap = StringToBitMap(jArr.getJSONObject(eventID).getString("signature"));
+                imageView.setBackgroundColor(Color.parseColor("#d6d6d6"));
+                imageView.setImageBitmap(bitmap);
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -131,7 +151,6 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     //intent that passes ID to page where user can create samples
-                    //TODO: make them sign for event
                     Intent intent = new Intent(MainActivity.this, signActivity.class);
                     intent.putExtra("eventID", eventID)
                             .putExtra("editState", edited);
@@ -229,7 +248,7 @@ public class MainActivity extends AppCompatActivity {
                                 jArr.getJSONObject(eventID).put("name", sampName);
                                 jArr.getJSONObject(eventID).put("samplerName", samplerName);
                                 jArr.getJSONObject(eventID).put("type", sampType);
-                                jArr.getJSONObject(eventID).put("editDate", dateobj);
+                                jArr.getJSONObject(eventID).put("editTime", dateobj);
 
                                 if (!jArr.getJSONObject(eventID).has("samples") ) {
                                     System.out.println("adding samples array");
@@ -238,7 +257,6 @@ public class MainActivity extends AppCompatActivity {
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
-                            //TODO send to sign activity
                             Intent intent = new Intent(MainActivity.this, signActivity.class);
                             intent.putExtra("eventID", eventID)
                                     .putExtra("editState", edited);
@@ -279,6 +297,22 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+        createdText = findViewById(R.id.eventCreatedTextView);
+        editedText = findViewById(R.id.eventEditedTextView);
+
+        try {
+            if (jArr.getJSONObject(eventID).has("samplingDate")) {
+                createdText.setText("Time created: " + jArr.getJSONObject(eventID).get("samplingDate"));
+            }
+            if (jArr.getJSONObject(eventID).has("editDate")) {
+                editedText.setText("Time last edited: " + jArr.getJSONObject(eventID).get("editTime"));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
     }
 
     private TextWatcher textWatcher = new TextWatcher() {
@@ -301,5 +335,21 @@ public class MainActivity extends AppCompatActivity {
 
         }
     };
+
+    public Bitmap StringToBitMap(String encodedString) {
+        try {
+            byte[] encodeByte = Base64.decode(encodedString, Base64.DEFAULT);
+            Bitmap bitmap = BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
+            return bitmap;
+        } catch (Exception e) {
+            e.getMessage();
+            return null;
+        }
+    }
+
+    public void onBackPressed() {
+        Intent intent = new Intent(MainActivity.this, selectActivity.class);
+        startActivity(intent);
+    }
 
 }

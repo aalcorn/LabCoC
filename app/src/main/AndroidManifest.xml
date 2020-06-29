@@ -13,7 +13,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".signActivity"></activity>
+        <activity android:name=".downloadsShowActivity"></activity>
+        <activity android:name=".downloadActivity" />
+        <activity android:name=".signActivity" />
         <activity android:name=".sampleEditActivity" />
         <activity android:name=".samplesActivity" />
         <activity
@@ -26,7 +28,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity"></activity>
+        <activity android:name=".MainActivity" />
     </application>
 
 </manifest>
