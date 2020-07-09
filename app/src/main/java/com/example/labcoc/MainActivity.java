@@ -92,7 +92,6 @@ public class MainActivity extends AppCompatActivity {
         //SPINNER
 
         //put all facility names in an array. When a facility is selected, update a new facilityID variable with the facility's corresponding ID.
-        //TODO FOR SOME REASON THIS BULLSHIT CRASHES MY APP WHEN I DONT HAVE THE ARRAY = OTHER THING
         String[] array = new String[fArr.length()];
         for(int i = 0; i < fArr.length(); i++) {
             try {
