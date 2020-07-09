@@ -14,13 +14,13 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_marginTop="168dp"
+        android:layout_marginTop="24dp"
         android:ems="10"
         android:hint="Sampler Name"
         android:inputType="text"
         app:layout_constraintBottom_toTopOf="@+id/confButton"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/nameBox" />
 
     <EditText
         android:id="@+id/nameBox"
@@ -29,11 +29,10 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:layout_marginBottom="8dp"
+        android:layout_marginTop="32dp"
         android:ems="10"
         android:hint="Sampling Event Name"
         android:inputType="text"
-        app:layout_constraintBottom_toTopOf="@+id/samplerNameBox"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/mainEditButton" />
 
@@ -74,11 +73,11 @@
         android:id="@+id/radioGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="24dp"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/samplerNameBox">
+        app:layout_constraintTop_toBottomOf="@+id/textView9">
 
         <RadioButton
             android:id="@+id/hpcButton"
@@ -108,13 +107,12 @@
         android:id="@+id/textView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="64dp"
-        android:layout_marginRight="64dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
         android:text="Sampler Name:"
         android:textSize="18sp"
         app:layout_constraintBaseline_toBaselineOf="@+id/samplerNameBox"
-        app:layout_constraintEnd_toStartOf="@+id/samplerNameBox"
-        app:layout_constraintStart_toStartOf="@+id/textView2" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <android.support.v7.widget.AppCompatImageView
         android:id="@+id/imageView"
@@ -128,23 +126,43 @@
         app:layout_constraintTop_toBottomOf="@+id/radioGroup" />
 
     <TextView
-        android:id="@+id/eventEditedTextView"
+        android:id="@+id/timeCreatedTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/confButton"
+        app:layout_constraintBottom_toTopOf="@+id/downSampButton"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
-        android:id="@+id/eventCreatedTextView"
+        android:id="@+id/timeEditedText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/eventEditedTextView"
+        app:layout_constraintBottom_toTopOf="@+id/timeCreatedTextView"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/textView9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="34dp"
+        android:text="Facility: "
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView3" />
+
+    <Spinner
+        android:id="@+id/spinner2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/samplerNameBox" />
 
 </android.support.constraint.ConstraintLayout>

@@ -40,7 +40,9 @@ import javax.net.ssl.HttpsURLConnection;
 
 public class selectActivity extends AppCompatActivity {
 
-    private HttpURLConnection connection;
+    private HttpURLConnection downloadsConnection;
+    private HttpURLConnection facilitiesConnection;
+    private HttpURLConnection uploadConnection;
 
     Button button;
     Button uploadButton;
@@ -53,6 +55,7 @@ public class selectActivity extends AppCompatActivity {
         setContentView(R.layout.content_select);
 
         ((MyApplication) getApplication()).loadJson();
+        ((MyApplication) getApplication()).loadFacs();
 
         final JSONArray jArr = ((MyApplication) getApplication()).mainArray;
 
@@ -63,10 +66,17 @@ public class selectActivity extends AppCompatActivity {
             try {
                 if(!jArr.getJSONObject(i-1).has("deleted")) {
                     Button myButton = new Button(selectActivity.this);
-                    try {
+                    //TODO Fix this to test for if there is a name and if there isn't do the event # + i thing so we stop throwing errors
+                    /*try {
                         myButton.setText(jArr.getJSONObject(i-1).getString("name"));
                     } catch (JSONException e) {
                         e.printStackTrace();
+                        myButton.setText("Event #" + i);
+                    }*/
+                    if(jArr.getJSONObject(i-1).has("name")) {
+                        myButton.setText(jArr.getJSONObject(i-1).getString("name"));
+                    }
+                    else {
                         myButton.setText("Event #" + i);
                     }
                     myButton.setId(i);
@@ -134,63 +144,8 @@ public class selectActivity extends AppCompatActivity {
         uploadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                
-                //do a POST to josh's server
-                Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        URL url = null;
-                        HttpURLConnection connection = null;
-                        InputStream stream = null;
-                        try {
-                            //url =new URL("http://174.126.172.64:3000/sampling");
-                            url = new URL("http://69.92.212.4/sampling/app");
-                            connection = (HttpURLConnection) url.openConnection();
-                            connection.setRequestMethod("POST");
-                            connection.setDoOutput(true);
-                            connection.setDoInput(true);
-
-                            String data = URLEncoder.encode("data", "UTF-8") + "=" + URLEncoder.encode(jArr.toString(), "UTF-8");
-
-                            connection.connect();
-
-                            OutputStreamWriter wr = new OutputStreamWriter(connection.getOutputStream());
-                            wr.write(data);
-                            wr.flush();
-
-                            stream = connection.getInputStream();
-                            BufferedReader reader = new BufferedReader(new InputStreamReader(stream, "UTF-8"), 8);
-                            String result = reader.readLine();
-
-                            System.out.println(result);
-
-                            wr.close();
-                            reader.close();
-                            connection.disconnect();
-                            //Toast.makeText(selectActivity.this, "Success!", Toast.LENGTH_SHORT).show();
-
-                        } catch (MalformedURLException e) {
-                            e.printStackTrace();
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(selectActivity.this,"Bad URL!", Toast.LENGTH_SHORT).show();
-                                }
-                            });
-
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(selectActivity.this,"Failed to connect to URL!", Toast.LENGTH_SHORT).show();
-                                }
-                            });
-
-                        }
-                    }
-                });
-                thread.start();
+                Intent intent = new Intent(selectActivity.this, signActivity.class);
+                startActivity(intent);
             }
         });
 
@@ -224,7 +179,7 @@ public class selectActivity extends AppCompatActivity {
             public void onClick(View view) {
                 System.out.println("JSON size: " + ((MyApplication) getApplication()).getSize());
                 //Toast.makeText(selectActivity.this, "WIP", Toast.LENGTH_LONG).show();
-                //getJson();
+                getJson();
                 getFacilities();
                 Intent intent = new Intent(selectActivity.this, downloadActivity.class);
                 startActivity(intent);
@@ -246,20 +201,20 @@ public class selectActivity extends AppCompatActivity {
 
                     try {
 
-                        // Set up and perform get request
-                        URL url = new URL("http://69.92.212.4/sampling/incomplete");
-                        connection = (HttpURLConnection) url.openConnection();
+                        // Set up and perform get request from sampling incomplete URL
+                        URL url = new URL("REDACTED");
+                        downloadsConnection = (HttpURLConnection) url.openConnection();
 
-                        connection.setRequestMethod("GET");
-                        connection.setConnectTimeout(10000);
-                        connection.setReadTimeout(10000);
+                        downloadsConnection.setRequestMethod("GET");
+                        downloadsConnection.setConnectTimeout(10000);
+                        downloadsConnection.setReadTimeout(10000);
 
-                        int status = connection.getResponseCode();
+                        int status = downloadsConnection.getResponseCode();
 
                         System.out.println("Response code: " + status);
 
                         if (status> 299) { // Error code
-                            reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
+                            reader = new BufferedReader(new InputStreamReader(downloadsConnection.getErrorStream()));
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -273,7 +228,7 @@ public class selectActivity extends AppCompatActivity {
                             reader.close();
                         }
                         else { // Populate responseContent with info from get request
-                            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                            reader = new BufferedReader(new InputStreamReader(downloadsConnection.getInputStream()));
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -332,20 +287,20 @@ public class selectActivity extends AppCompatActivity {
 
                     try {
 
-                        // Set up and perform get request
-                        URL url = new URL("http://69.92.212.4/facilities/app");
-                        connection = (HttpURLConnection) url.openConnection();
+                        // Set up and perform get request from facilities app URL
+                        URL url = new URL("REDACTED");
+                        facilitiesConnection = (HttpURLConnection) url.openConnection();
 
-                        connection.setRequestMethod("GET");
-                        connection.setConnectTimeout(10000);
-                        connection.setReadTimeout(10000);
+                        facilitiesConnection.setRequestMethod("GET");
+                        facilitiesConnection.setConnectTimeout(10000);
+                        facilitiesConnection.setReadTimeout(10000);
 
-                        int status = connection.getResponseCode();
+                        int status = facilitiesConnection.getResponseCode();
 
                         System.out.println("Response code: " + status);
 
                         if (status> 299) { // Error code
-                            reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
+                            reader = new BufferedReader(new InputStreamReader(facilitiesConnection.getErrorStream()));
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -359,7 +314,7 @@ public class selectActivity extends AppCompatActivity {
                             reader.close();
                         }
                         else { // Populate responseContent with info from get request
-                            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                            reader = new BufferedReader(new InputStreamReader(facilitiesConnection.getInputStream()));
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -380,8 +335,11 @@ public class selectActivity extends AppCompatActivity {
 
                         System.out.println("Before array created");
                         JSONObject facilities = new JSONObject(responseContent.toString());
-                        System.out.println("facilities: " + facilities.toString());
+                        JSONArray facilityArray = new JSONArray(facilities.getJSONArray("facilities").toString());
+                        System.out.println("facilities: " + facilityArray.toString());
 
+                        ((MyApplication) getApplication()).facilitiesArray = facilityArray;
+                        ((MyApplication) getApplication()).saveFacs();
                     } catch (MalformedURLException e) {
                         e.printStackTrace();
                     } catch (ProtocolException e) {

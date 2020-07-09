@@ -35,9 +35,9 @@ public class downloadActivity extends AppCompatActivity {
         final JSONArray dArr = ((MyApplication) getApplication()).downloadsArray;
 
         System.out.println("Downloads Array: " + dArr.toString());
+        System.out.println("Facilities Array: " + ((MyApplication) getApplication()).facilitiesArray.toString());
 
         refreshList(dArr);
-
 
         refreshButton = findViewById(R.id.refButton);
 

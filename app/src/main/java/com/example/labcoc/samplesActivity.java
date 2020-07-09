@@ -27,6 +27,12 @@ public class samplesActivity extends AppCompatActivity {
         setContentView(R.layout.activity_samples);
         final JSONArray jArr = ((MyApplication) getApplication()).mainArray;
 
+        try {
+            System.out.println(jArr.getJSONObject(eventID).toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
         eventID = getIntent().getExtras().getInt("eventID");
 
         eventNameText = findViewById(R.id.eventNameText);
@@ -44,7 +50,7 @@ public class samplesActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        System.out.println(jArr.toString());
+        System.out.println("jArr: " + jArr.toString());
 
         //populate list with all previous samples (This will be done by going to the index of the sampling event and looking at the length of the samples array)
 

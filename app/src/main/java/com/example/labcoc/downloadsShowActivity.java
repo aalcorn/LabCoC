@@ -33,6 +33,8 @@ public class downloadsShowActivity extends AppCompatActivity {
 
         final JSONArray dArr = ((MyApplication) getApplication()).downloadsArray;
 
+        final JSONArray fArr = ((MyApplication) getApplication()).facilitiesArray;
+
         eventID = getIntent().getExtras().getInt("eventID");
 
         downloadButton = findViewById(R.id.downEventButton);
@@ -46,7 +48,6 @@ public class downloadsShowActivity extends AppCompatActivity {
 
         try {
             nameBox.setText(dArr.getJSONObject(eventID).getString("name"));
-            samplerNameBox.setText(dArr.getJSONObject(eventID).getString("samplerName"));
 
             if(dArr.getJSONObject(eventID).getString("type").toLowerCase().equals("hpc")) {
                 hpcButton.performClick();
@@ -57,7 +58,14 @@ public class downloadsShowActivity extends AppCompatActivity {
                 hpcButton.setEnabled(false);
             }
 
-            //facilityText.setText(dArr.getJSONObject(eventID).getString("facility"));
+            for (int i = 0; i < fArr.length(); i++) {
+                System.out.println(dArr.getJSONObject(eventID).getString("facilityID") + "down");
+                System.out.println(fArr.getJSONObject(i).getString("_id") + "fac");
+                if (dArr.getJSONObject(eventID).getString("facilityID").equals(fArr.getJSONObject(i).getString("_id"))) {
+                    facilityText.setText(fArr.getJSONObject(i).getString("name"));
+                    System.out.println("Should be updated here");
+                }
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
