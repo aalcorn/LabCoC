@@ -94,8 +94,6 @@ public class signActivity extends AppCompatActivity {
 
                 postJson();
 
-                Intent intent = new Intent(signActivity.this, selectActivity.class);
-                startActivity(intent);
             }
 
 
@@ -149,7 +147,6 @@ public class signActivity extends AppCompatActivity {
                     connection.connect();
 
 
-
                     OutputStreamWriter wr = new OutputStreamWriter(connection.getOutputStream());
                     wr.write(data);
                     wr.flush();
@@ -176,19 +173,22 @@ public class signActivity extends AppCompatActivity {
 
                     stream = connection.getInputStream();
                     BufferedReader reader = new BufferedReader(new InputStreamReader(stream, "UTF-8"), 8);
-                    String result = reader.readLine();
+                    final String result = reader.readLine();
 
                     System.out.println(result);
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(signActivity.this,"Upload Successful!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(signActivity.this,result, Toast.LENGTH_SHORT).show();
                         }
                     });
 
                     //CLEAR IF GOOD RESULT
 
                     ((MyApplication) getApplication()).clearJson();
+
+                    Intent intent = new Intent(signActivity.this, selectActivity.class);
+                    startActivity(intent);
 
                     wr.close();
                     reader.close();

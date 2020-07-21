@@ -63,7 +63,7 @@ public class downloadActivity extends AppCompatActivity {
                     try {
 
                         // Set up and perform get request
-                        URL url = new URL("http://69.92.212.4/sampling/incomplete");
+                        URL url = new URL("REDACTED");
                         connection = (HttpURLConnection) url.openConnection();
 
                         connection.setRequestMethod("GET");

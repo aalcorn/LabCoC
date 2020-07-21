@@ -80,6 +80,7 @@ public class downloadsShowActivity extends AppCompatActivity {
                 try {
                     jArr.put(dArr.getJSONObject(eventID));
                     System.out.println(jArr.toString());
+                    dArr.remove(eventID);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

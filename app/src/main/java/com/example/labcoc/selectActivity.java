@@ -66,7 +66,6 @@ public class selectActivity extends AppCompatActivity {
             try {
                 if(!jArr.getJSONObject(i-1).has("deleted")) {
                     Button myButton = new Button(selectActivity.this);
-                    //TODO Fix this to test for if there is a name and if there isn't do the event # + i thing so we stop throwing errors
                     /*try {
                         myButton.setText(jArr.getJSONObject(i-1).getString("name"));
                     } catch (JSONException e) {
@@ -201,7 +200,7 @@ public class selectActivity extends AppCompatActivity {
 
                     try {
 
-                        // Set up and perform get request from sampling incomplete URL
+                        // Set up and perform get request
                         URL url = new URL("REDACTED");
                         downloadsConnection = (HttpURLConnection) url.openConnection();
 
@@ -287,7 +286,7 @@ public class selectActivity extends AppCompatActivity {
 
                     try {
 
-                        // Set up and perform get request from facilities app URL
+                        // Set up and perform get request
                         URL url = new URL("REDACTED");
                         facilitiesConnection = (HttpURLConnection) url.openConnection();
 

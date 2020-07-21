@@ -114,7 +114,6 @@ public class sampleEditActivity extends AppCompatActivity {
             //update fields pertaining to both legionella and HPC
             if(jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).has("sampleLocation")) {
                 sampleLocText.setText(jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).getString("sampleLocation"));
-                edited = true;
                 sampleLocText.setFocusable(false);
             }
             if(jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).has("volume")) {
@@ -151,6 +150,8 @@ public class sampleEditActivity extends AppCompatActivity {
                 }
                 if (jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).has("pH")) {
                     phText.setText(jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).getString("pH"));
+                    edited = true;
+                    phText.setFocusable(false);
                 }
             }
         } catch (JSONException e) {

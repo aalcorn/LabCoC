@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
     TextView createdText;
     TextView editedText;
 
-    ImageView imageView;
+    //ImageView imageView;
 
     RadioButton hpcButton;
     RadioButton legionellaButton;
@@ -141,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
                     System.out.println(fArr.getJSONObject(i).getString("_id") + " Fac ID facArray");
                     System.out.println("Loop");
                     if(jArr.getJSONObject(eventID).getString("facilityID").equals(fArr.getJSONObject(i).getString("_id"))) {
-                        spinner.setSelection(i+1);
+                        spinner.setSelection(i);
                         spinner.setEnabled(false);
                         spinner.setBackgroundDrawable(d);
                         edited = true;
@@ -149,12 +149,12 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
-            if(jArr.getJSONObject(eventID).has("signature")) {
+            /*if(jArr.getJSONObject(eventID).has("signature")) {
                 imageView = findViewById(R.id.imageView);
                 Bitmap bitmap = StringToBitMap(jArr.getJSONObject(eventID).getString("signature"));
                 imageView.setBackgroundColor(Color.parseColor("#d6d6d6"));
                 imageView.setImageBitmap(bitmap);
-            }
+            }*/
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -177,8 +177,9 @@ public class MainActivity extends AppCompatActivity {
                         samplerName = samplerNameText.getText().toString();
                         spinner.setEnabled(true);
                         System.out.println("Position: " + spinner.getSelectedItemPosition());
+                        System.out.println("fArr: " + fArr.toString());
                         try {
-                            facilityID = fArr.getJSONObject(spinner.getSelectedItemPosition()-1).getString("_id");
+                            facilityID = fArr.getJSONObject(spinner.getSelectedItemPosition()).getString("_id");
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -232,6 +233,7 @@ public class MainActivity extends AppCompatActivity {
                 editButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        button.setEnabled(false);
                         delButton.setEnabled(true);
                         delButton.setVisibility(View.VISIBLE);
 
@@ -247,14 +249,11 @@ public class MainActivity extends AppCompatActivity {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
                                                 Toast.makeText(MainActivity.this,"Deleted", Toast.LENGTH_LONG).show();
-                                                try {
-                                                    jArr.getJSONObject(eventID).put("deleted", true);
-                                                    Intent intent = new Intent(MainActivity.this, selectActivity.class);
-                                                    ((MyApplication) getApplication()).saveJson();
-                                                    startActivity(intent);
-                                                } catch (JSONException e) {
-                                                    e.printStackTrace();
-                                                }
+                                                //jArr.getJSONObject(eventID).put("deleted", true);
+                                                jArr.remove(eventID);
+                                                Intent intent = new Intent(MainActivity.this, selectActivity.class);
+                                                ((MyApplication) getApplication()).saveJson();
+                                                startActivity(intent);
                                             }
                                         })
                                         .setNegativeButton(android.R.string.no, null).show();
@@ -278,7 +277,7 @@ public class MainActivity extends AppCompatActivity {
                                 samplerName = samplerNameText.getText().toString();
                                 spinner.setEnabled(true);
                                 try {
-                                    facilityID = fArr.getJSONObject(spinner.getSelectedItemPosition()-1).getString("_id");
+                                    facilityID = fArr.getJSONObject(spinner.getSelectedItemPosition()).getString("_id");
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
