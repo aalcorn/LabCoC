@@ -1,24 +1,22 @@
 package com.example.labcoc;
 
 import android.content.Intent;
-import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
+import android.widget.Spinner;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 
 public class downloadsShowActivity extends AppCompatActivity {
     EditText nameBox;
-    EditText samplerNameBox;
+    EditText expectedSamplesBox;
     EditText facilityText;
-
-    RadioButton hpcButton;
-    RadioButton legButton;
+    EditText analyteText;
 
     Button downloadButton;
 
@@ -40,23 +38,20 @@ public class downloadsShowActivity extends AppCompatActivity {
         downloadButton = findViewById(R.id.downEventButton);
 
         nameBox = findViewById(R.id.nameBox);
-        samplerNameBox = findViewById(R.id.samplerNameBox);
+        expectedSamplesBox = findViewById(R.id.expectedSamplesBox);
         facilityText = findViewById(R.id.facilityText);
-
-        hpcButton = findViewById(R.id.hpcButton);
-        legButton = findViewById(R.id.legionButton);
+        analyteText = findViewById(R.id.analyteText);
 
         try {
             nameBox.setText(dArr.getJSONObject(eventID).getString("name"));
+            if (dArr.getJSONObject(eventID).has("anticipatedSamples")) {
+                if (dArr.getJSONObject(eventID).getString("anticipatedSamples").equals("null")) {
+                    dArr.getJSONObject(eventID).put("anticipatedSamples", "0");
+                }
+                expectedSamplesBox.setText(dArr.getJSONObject(eventID).getString("anticipatedSamples"));
+            }
 
-            if(dArr.getJSONObject(eventID).getString("type").toLowerCase().equals("hpc")) {
-                hpcButton.performClick();
-                legButton.setEnabled(false);
-            }
-            else {
-                legButton.performClick();
-                hpcButton.setEnabled(false);
-            }
+            analyteText.setText(dArr.getJSONObject(eventID).getString("type"));
 
             for (int i = 0; i < fArr.length(); i++) {
                 System.out.println(dArr.getJSONObject(eventID).getString("facilityID") + "down");
@@ -71,8 +66,9 @@ public class downloadsShowActivity extends AppCompatActivity {
         }
 
         nameBox.setFocusable(false);
-        samplerNameBox.setFocusable(false);
+        expectedSamplesBox.setFocusable(false);
         facilityText.setFocusable(false);
+        analyteText.setFocusable(false);
 
         downloadButton.setOnClickListener(new View.OnClickListener() {
             @Override

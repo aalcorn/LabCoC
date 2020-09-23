@@ -6,6 +6,15 @@
     android:layout_height="match_parent"
     tools:context=".sampleEditActivity">
 
+    <Spinner
+        android:id="@+id/faucetSpinner"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/pHText"
+        app:layout_constraintTop_toBottomOf="@+id/pHText" />
+
     <EditText
         android:id="@+id/SampleLocText"
         android:layout_width="wrap_content"
@@ -19,71 +28,18 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/sampleDeleteButton" />
 
-            <EditText
-                android:id="@+id/hotColdText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginRight="8dp"
-                android:ems="10"
-                android:hint="Hot/Cold"
-                android:inputType="textPersonName"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/testCodeText" />
 
-            <EditText
-                android:id="@+id/volText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginRight="8dp"
-                android:ems="10"
-                android:hint="Vol in mL"
-                android:inputType="number"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/SampleLocText" />
-
-
-            <EditText
-                android:id="@+id/testCodeText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginRight="8dp"
-                android:ems="10"
-                android:hint="Test Code"
-                android:inputType="textPersonName"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/volText" />
-
-            <EditText
-                android:id="@+id/faucetText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginRight="8dp"
-                android:ems="10"
-                android:hint="Faucet type"
-                android:inputType="textPersonName"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/hotColdText" />
-
-            <EditText
-                android:id="@+id/tempText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginRight="8dp"
-                android:ems="10"
-                android:hint="Temp (F)"
-                android:inputType="number"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/faucetText" />
+    <EditText
+        android:id="@+id/tempText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="8dp"
+        android:ems="10"
+        android:hint="Temp (F)"
+        android:inputType="number"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/SampleLocText" />
 
             <EditText
                 android:id="@+id/bioText"
@@ -122,51 +78,29 @@
                 app:layout_constraintBaseline_toBaselineOf="@+id/SampleLocText"
                 app:layout_constraintStart_toStartOf="parent" />
 
-            <TextView
-                android:id="@+id/volTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginLeft="8dp"
-                android:text="Volume (mL):"
-                android:textSize="18sp"
-                app:layout_constraintBaseline_toBaselineOf="@+id/volText"
-                app:layout_constraintStart_toStartOf="parent" />
+    <TextView
+        android:id="@+id/hotColdTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="30dp"
+        android:text="Hot/Cold:"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/faucetTypeTextView" />
 
-            <TextView
-                android:id="@+id/testCodeTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginLeft="8dp"
-                android:text="Test Code:"
-                android:textSize="18sp"
-                app:layout_constraintBaseline_toBaselineOf="@+id/testCodeText"
-                app:layout_constraintStart_toStartOf="parent" />
+    <TextView
+        android:id="@+id/faucetTypeTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="30dp"
+        android:text="Faucet type:"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pHTextView" />
 
-            <TextView
-                android:id="@+id/hotColdTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginLeft="8dp"
-                android:text="Hot/Cold:"
-                android:textSize="18sp"
-                app:layout_constraintBaseline_toBaselineOf="@+id/hotColdText"
-                app:layout_constraintStart_toStartOf="parent" />
-
-            <TextView
-                android:id="@+id/faucetTypeTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginLeft="8dp"
-                android:text="Faucet type:"
-                android:textSize="18sp"
-                app:layout_constraintBaseline_toBaselineOf="@+id/faucetText"
-                app:layout_constraintStart_toStartOf="parent" />
-
-            <TextView
+    <TextView
                 android:id="@+id/tempTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -177,16 +111,15 @@
                 app:layout_constraintBaseline_toBaselineOf="@+id/tempText"
                 app:layout_constraintStart_toStartOf="parent" />
 
-            <TextView
-                android:id="@+id/bioTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginLeft="8dp"
-                android:text="Biocide:"
-                android:textSize="18sp"
-                app:layout_constraintBaseline_toBaselineOf="@+id/bioText"
-                app:layout_constraintStart_toStartOf="parent" />
+    <TextView
+        android:id="@+id/bioTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="Residual Biocide:"
+        android:textSize="18sp"
+        app:layout_constraintBaseline_toBaselineOf="@+id/bioText"
+        app:layout_constraintStart_toStartOf="parent" />
 
             <TextView
                 android:id="@+id/pHTextView"
@@ -204,9 +137,8 @@
         android:id="@+id/sampleDeleteButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         android:text="Delete"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -215,8 +147,7 @@
         android:id="@+id/sampleEditBackButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
+        android:layout_marginStart="8dp"
         android:layout_marginBottom="8dp"
         android:text="Back"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -252,5 +183,44 @@
         android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toTopOf="@+id/sampleEditBackButton"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/commentButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:text="Comment"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <CheckBox
+        android:id="@+id/potableBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="7dp"
+        android:text="Potable"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Spinner
+        android:id="@+id/hotColdspinner"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/pHText"
+        app:layout_constraintTop_toBottomOf="@+id/faucetSpinner" />
+
+    <TextView
+        android:id="@+id/sampleNumberTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Sample Number: "
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/hotColdTextView" />
 
 </android.support.constraint.ConstraintLayout>

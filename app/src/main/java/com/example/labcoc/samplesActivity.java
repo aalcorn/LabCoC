@@ -1,6 +1,8 @@
 package com.example.labcoc;
 
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -18,7 +20,9 @@ public class samplesActivity extends AppCompatActivity {
     private int eventID;
     private Button button;
     private int samplesCount;
+    private int completeSamplesCount;
     TextView eventNameText;
+    TextView sampleCounterText;
     Button backButton;
 
     @Override
@@ -36,6 +40,7 @@ public class samplesActivity extends AppCompatActivity {
         eventID = getIntent().getExtras().getInt("eventID");
 
         eventNameText = findViewById(R.id.eventNameText);
+        sampleCounterText = findViewById(R.id.sampleCounterText);
 
         try {
             eventNameText.setText("Samples for Event: " + jArr.getJSONObject(eventID).getString("name"));
@@ -54,11 +59,25 @@ public class samplesActivity extends AppCompatActivity {
 
         //populate list with all previous samples (This will be done by going to the index of the sampling event and looking at the length of the samples array)
 
+        completeSamplesCount = 0;
         for(int i = 1; i <= samplesCount; i++) {
             try {
                 if(!jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(i-1).has("deleted")) {
                     Button myButton = new Button(samplesActivity.this);
-                    myButton.setText("Sample #"+ i);
+                    if (jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(i-1).has("sampleLocation") && jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(i-1).has("sampleNumber") ) {
+                        myButton.setText("Sample #"+ jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(i-1).get("sampleNumber") + ": " + jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(i-1).get("sampleLocation"));
+                    }
+                    else if (jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(i-1).has("sampleLocation")) {
+                        myButton.setText(jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(i-1).get("sampleLocation").toString());
+                    }
+                    else {
+                        myButton.setText("Unnamed Sample");
+                    }
+                    if (jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(i-1).has("time")) {
+                        completeSamplesCount++;
+                        myButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#43ba00")));
+                    }
+
                     myButton.setId(i);
                     final int id_ = myButton.getId();
 
@@ -70,6 +89,7 @@ public class samplesActivity extends AppCompatActivity {
                             Intent intent = new Intent(samplesActivity.this, sampleEditActivity.class);
                             intent.putExtra("eventID", eventID);
                             intent.putExtra("sampleID", id_);
+                            intent.putExtra("completedSamplesCount", completeSamplesCount);
                             ((MyApplication) getApplication()).saveJson();
                             startActivity(intent);
                         }
@@ -80,6 +100,12 @@ public class samplesActivity extends AppCompatActivity {
                 System.out.println("ERROR");
             }
 
+        }
+
+        try {
+            sampleCounterText.setText( completeSamplesCount + "/" + jArr.getJSONObject(eventID).get("anticipatedSamples") + " Samples Completed");
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
 
 
@@ -98,7 +124,7 @@ public class samplesActivity extends AppCompatActivity {
                 }
 
                 Button myButton = new Button(samplesActivity.this);
-                myButton.setText("Sample #"+ samplesCount);
+                myButton.setText("Unnamed Sample");
                 myButton.setId(samplesCount);
                 final int id_ = myButton.getId();
 
@@ -120,6 +146,7 @@ public class samplesActivity extends AppCompatActivity {
                         Intent intent = new Intent(samplesActivity.this, sampleEditActivity.class);
                         intent.putExtra("eventID", eventID);
                         intent.putExtra("sampleID", id_);
+                        intent.putExtra("completedSamplesCount", completeSamplesCount);
                         ((MyApplication) getApplication()).saveJson();
                         startActivity(intent);
                     }

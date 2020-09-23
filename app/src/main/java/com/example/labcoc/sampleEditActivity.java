@@ -9,7 +9,11 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,45 +22,44 @@ import org.json.JSONException;
 
 import java.util.Date;
 
-//TODO: New *comments* field
-
 public class sampleEditActivity extends AppCompatActivity {
 
     TextView sampleLocText;
-    TextView testCodeText;
-    TextView faucetTypeText;
     TextView tempText;
     TextView bioCideText;
     TextView phText;
-    TextView hotColdText;
-    TextView volText;
 
-    TextView faucetTypeTextView;
     TextView tempTextView;
     TextView bioCideTextView;
     TextView phTextView;
     TextView hotColdTextView;
+    TextView faucetTypeTextView;
+
+    TextView sampleNumberTextView;
 
     TextView timeCreated;
     TextView timeEdited;
 
+    CheckBox potableBox;
+
     Button button;
     Button backButton;
     Button delButton;
+    Button commentButton;
 
-    String hotCold;
-    String vol;
     String sampleLoc;
-    String faucetType;
     String temp;
     String biocide;
     String ph;
-    String testCode;
 
+    Spinner faucetTypeSpinner;
+    Spinner hotColdSpinner;
+
+    private int sampleNumber; //The label on the sampler's bottle
     int eventID;
     int sID; //The place of the sample in the sampling event's sample array
     boolean edited = false;
-    boolean isHPC;
+    boolean isLegionella;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,14 +72,19 @@ public class sampleEditActivity extends AppCompatActivity {
         final JSONArray jArr = ((MyApplication) getApplication()).mainArray;
         System.out.println(jArr.toString());
 
+        sampleNumber = getIntent().getExtras().getInt("completedSamplesCount") + 1;
+
         sampleLocText = findViewById(R.id.SampleLocText);
-        hotColdText = findViewById(R.id.hotColdText);
-        volText = findViewById(R.id.volText);
-        testCodeText = findViewById(R.id.testCodeText);
-        faucetTypeText = findViewById(R.id.faucetText);
         tempText = findViewById(R.id.tempText);
         bioCideText = findViewById(R.id.bioText);
         phText = findViewById(R.id.pHText);
+
+        faucetTypeSpinner = findViewById(R.id.faucetSpinner);
+        hotColdSpinner = findViewById(R.id.hotColdspinner);
+
+        sampleNumberTextView = findViewById(R.id.sampleNumberTextView);
+
+        potableBox = findViewById(R.id.potableBox);
 
         hotColdTextView = findViewById(R.id.hotColdTextView);
         faucetTypeTextView = findViewById(R.id.faucetTypeTextView);
@@ -84,12 +92,13 @@ public class sampleEditActivity extends AppCompatActivity {
         bioCideTextView = findViewById(R.id.bioTextView);
         phTextView = findViewById(R.id.pHTextView);
 
+        //Show views based on the type of sample
         try {
-            if ((jArr.getJSONObject(eventID).get("type").equals("hpc"))) {
-                isHPC = true;
+            if (!(jArr.getJSONObject(eventID).get("type").equals("Legionella"))) {
+                isLegionella = false;
 
-                hotColdText.setVisibility(View.INVISIBLE);
-                faucetTypeText.setVisibility(View.INVISIBLE);
+                hotColdSpinner.setVisibility(View.INVISIBLE);
+                faucetTypeSpinner.setVisibility(View.INVISIBLE);
                 tempText.setVisibility(View.INVISIBLE);
                 bioCideText.setVisibility(View.INVISIBLE);
                 phText.setVisibility(View.INVISIBLE);
@@ -102,41 +111,101 @@ public class sampleEditActivity extends AppCompatActivity {
 
             }
             else {
-                isHPC = false;
+                isLegionella = true;
 
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
+        //SPINNER
+        final String[] faucetArray = {"Sink","Tub", "Shower", "Therapy Tub", "Therapy Pool", "Emergency Eyewash", "Emergency Shower", "Drinking Fountain", "Sink Sprayer", "Ice Machine"
+        , "Cooling tower", "Hot Water Storage Tank", "Water Tower", "Fire Sprinkler System", "Outdoor Water Feature", "Facility Main", "Building Incoming Water", "Other"};
+        ArrayAdapter<String> faucetAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, faucetArray);
+        faucetAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        faucetTypeSpinner.setAdapter(faucetAdapter);
+
+        final String[] hotColdArray = {"Cold","Hot", "Mixed"};
+        final ArrayAdapter<String> hotColdAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, hotColdArray);
+        hotColdAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        hotColdSpinner.setAdapter(hotColdAdapter);
+
+
+        //Comment button setup
+        commentButton = findViewById(R.id.commentButton);
+        commentButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder dialog = new AlertDialog.Builder(sampleEditActivity.this);
+                dialog.setTitle("Comment: ");
+
+                final EditText commentText = new EditText(sampleEditActivity.this);
+                try {
+                    if (jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).has("comment")) {
+                        commentText.setText(jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).getString("comment"));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                dialog.setView(commentText);
+
+                dialog.setPositiveButton("Done", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        try {
+                            jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("comment", commentText.getText().toString());
+                            ((MyApplication) getApplication()).saveJson();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+
+                dialog.setNegativeButton("Cancel", null).show();
+            }
+        });
 
         try {
             //update fields pertaining to both legionella and HPC
             if(jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).has("sampleLocation")) {
-                sampleLocText.setText(jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).getString("sampleLocation"));
-                sampleLocText.setFocusable(false);
+                if (!jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).getString("sampleLocation").equals("")) {
+                    sampleLocText.setText(jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).getString("sampleLocation"));
+                    sampleLocText.setFocusable(false);
+                }
             }
-            if(jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).has("volume")) {
-                volText.setText(jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).getString("volume"));
+            if (jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).has("potable")) {
+                if(jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).getBoolean("potable")) {
+                    potableBox.setChecked(true);
+                }
                 edited = true;
-                volText.setFocusable(false);
+                potableBox.setEnabled(false);
             }
-            if (jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).has("testCode")) {
-                testCodeText.setText(jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).getString("testCode"));
-                edited = true;
-                testCodeText.setFocusable(false);
+            if (jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).has("sampleNumber")) {
+                sampleNumberTextView.setText("Sample Number: " + jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).get("sampleNumber"));
+            }
+            else {
+                sampleNumberTextView.setText("Sample Number: " + sampleNumber);
             }
             //update legionella fields
-            if (!isHPC) {
+            if (isLegionella) {
                 if(jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).has("hotCold")) {
-                    hotColdText.setText(jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).getString("hotCold"));
-                    edited = true;
-                    hotColdText.setFocusable(false);
+                    for(int i = 0; i < hotColdArray.length; i++) {
+                        if(hotColdArray[i].equals(jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).get("hotCold"))) {
+                            hotColdSpinner.setSelection(i);
+                            hotColdSpinner.setEnabled(false);
+                            edited = true;
+                        }
+                    }
                 }
                 if (jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).has("faucetType")) {
-                    faucetTypeText.setText(jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).getString("faucetType"));
-                    edited = true;
-                    faucetTypeText.setFocusable(false);
+                    for(int i = 0; i < faucetArray.length; i++) {
+                        if(faucetArray[i].equals(jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).get("faucetType"))) {
+                            faucetTypeSpinner.setSelection(i);
+                            faucetTypeSpinner.setEnabled(false);
+                            edited = true;
+                        }
+                    }
                 }
                 if (jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).has("temp")) {
                     tempText.setText(jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).getString("temp"));
@@ -159,11 +228,7 @@ public class sampleEditActivity extends AppCompatActivity {
         }
 
         sampleLocText.addTextChangedListener(textWatcher);
-        testCodeText.addTextChangedListener(textWatcher);
-        volText.addTextChangedListener(textWatcher);
-        if(!isHPC) {
-            hotColdText.addTextChangedListener(textWatcher);
-            faucetTypeText.addTextChangedListener(textWatcher);
+        if(isLegionella) {
             tempText.addTextChangedListener(textWatcher);
             bioCideText.addTextChangedListener(textWatcher);
             phText.addTextChangedListener(textWatcher);
@@ -172,6 +237,13 @@ public class sampleEditActivity extends AppCompatActivity {
         delButton = findViewById(R.id.sampleDeleteButton);
         button = findViewById(R.id.sampConfButton);
         button.setEnabled(false);
+        try {
+            if (jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).has("sampleLocation") && !edited) {
+                button.setEnabled(true);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
         delButton.setVisibility(View.INVISIBLE);
         delButton.setEnabled(false);
@@ -188,26 +260,22 @@ public class sampleEditActivity extends AppCompatActivity {
                 if(!edited) {
 
                     sampleLoc = sampleLocText.getText().toString();
-                    vol = volText.getText().toString();
-                    testCode = testCodeText.getText().toString();
 
                     Date dateObj = new Date();
 
                     try {
                         jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("sampleLocation", sampleLoc);
                         jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("sampleID", sID);
-                        jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("testCode", testCode);
-                        jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("volume", vol);
                         jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("time", dateObj);
-                        if (!isHPC) {
-                            hotCold = hotColdText.getText().toString();
-                            faucetType = faucetTypeText.getText().toString();
+                        jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("potable", potableBox.isChecked());
+                        jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("sampleNumber", sampleNumber);
+                        if (isLegionella) {
                             temp = tempText.getText().toString();
                             biocide = bioCideText.getText().toString();
                             ph = phText.getText().toString();
 
-                            jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("hotCold", hotCold);
-                            jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("faucetType", faucetType);
+                            jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("hotCold", hotColdArray[hotColdSpinner.getSelectedItemPosition()]);
+                            jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("faucetType", faucetArray[faucetTypeSpinner.getSelectedItemPosition()]);
                             jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("temp", temp);
                             jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("biocide", biocide);
                             jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("pH", ph);
@@ -230,22 +298,18 @@ public class sampleEditActivity extends AppCompatActivity {
 
                     sampleLocText.setFocusable(true);
                     sampleLocText.setFocusableInTouchMode(true);
-                    volText.setFocusable(true);
-                    volText.setFocusableInTouchMode(true);
-                    testCodeText.setFocusableInTouchMode(true);
-                    testCodeText.setFocusable(true);
+                    potableBox.setEnabled(true);
 
-                    if(!isHPC) {
-                        hotColdText.setFocusable(true);
-                        hotColdText.setFocusableInTouchMode(true);
-                        faucetTypeText.setFocusable(true);
-                        faucetTypeText.setFocusableInTouchMode(true);
+                    if(isLegionella) {
                         tempText.setFocusable(true);
                         tempText.setFocusableInTouchMode(true);
                         bioCideText.setFocusableInTouchMode(true);
                         bioCideText.setFocusable(true);
                         phText.setFocusable(true);
                         phText.setFocusableInTouchMode(true);
+
+                        faucetTypeSpinner.setEnabled(true);
+                        hotColdSpinner.setEnabled(true);
                     }
 
 
@@ -256,26 +320,21 @@ public class sampleEditActivity extends AppCompatActivity {
                         public void onClick(View v) {
 
                             sampleLoc = sampleLocText.getText().toString();
-                            vol = volText.getText().toString();
-                            testCode = testCodeText.getText().toString();
 
                             Date dateObj = new Date();
 
                             try {
                                 jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("sampleLocation", sampleLoc);
                                 jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("sampleID", sID);
-                                jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("testCode", testCode);
-                                jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("volume", vol);
                                 jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("editTime", dateObj);
-                                if (!isHPC) {
-                                    hotCold = hotColdText.getText().toString();
-                                    faucetType = faucetTypeText.getText().toString();
+                                jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("potable", potableBox.isChecked());
+                                if (isLegionella) {
                                     temp = tempText.getText().toString();
                                     biocide = bioCideText.getText().toString();
                                     ph = phText.getText().toString();
 
-                                    jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("hotCold", hotCold);
-                                    jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("faucetType", faucetType);
+                                    jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("hotCold", hotColdArray[hotColdSpinner.getSelectedItemPosition()]);
+                                    jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("faucetType", faucetArray[faucetTypeSpinner.getSelectedItemPosition()]);
                                     jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("temp", temp);
                                     jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("biocide", biocide);
                                     jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("pH", ph);
@@ -369,24 +428,20 @@ public class sampleEditActivity extends AppCompatActivity {
         //sets the confirmation button clickable only if all fields are filled in
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
-            //TODO add textchanged listners to all fields if legionella, only some if HPC
             sampleLoc = sampleLocText.getText().toString();
-            vol = volText.getText().toString();
-            testCode = testCodeText.getText().toString();
 
-            if(!isHPC) {
-                hotCold = hotColdText.getText().toString();
-                faucetType = faucetTypeText.getText().toString();
+            if(isLegionella) {
                 temp = tempText.getText().toString();
                 biocide = bioCideText.getText().toString();
                 ph = phText.getText().toString();
 
-                button.setEnabled(!testCode.isEmpty() && !vol.isEmpty() && !sampleLoc.isEmpty() && !hotCold.isEmpty() && !faucetType.isEmpty() && !temp.isEmpty() && !biocide.isEmpty() && !ph.isEmpty());
+                button.setEnabled(!sampleLoc.isEmpty() && !temp.isEmpty() && !biocide.isEmpty() && !ph.isEmpty());
 
             }
             else {
-                button.setEnabled(!testCode.isEmpty() && !vol.isEmpty() && !sampleLoc.isEmpty());
+                button.setEnabled(!sampleLoc.isEmpty());
             }
+
         }
 
         @Override

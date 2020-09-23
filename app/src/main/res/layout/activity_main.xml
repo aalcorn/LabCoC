@@ -7,14 +7,41 @@
     android:layout_gravity="center"
     tools:context=".MainActivity">
 
+    <Spinner
+        android:id="@+id/analyteSpinner"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/volumeText"
+        app:layout_constraintTop_toBottomOf="@+id/facilitySpinner" />
+
+    <Spinner
+        android:id="@+id/testCodeSpinner"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/volumeText"
+        app:layout_constraintTop_toBottomOf="@+id/BiocideSpinner" />
+
+    <Spinner
+        android:id="@+id/BiocideSpinner"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/volumeText"
+        app:layout_constraintTop_toBottomOf="@+id/volumeText" />
+
     <EditText
-        android:id="@+id/samplerNameBox"
+        android:id="@+id/expectedSamplesBox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="15dp"
         android:ems="10"
         android:hint="Sampler Name"
         android:inputType="text"
@@ -69,29 +96,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <RadioGroup
-        android:id="@+id/radioGroup"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView9">
-
-        <RadioButton
-            android:id="@+id/hpcButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="HPC" />
-
-        <RadioButton
-            android:id="@+id/legionButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Legionella" />
-    </RadioGroup>
-
     <TextView
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
@@ -111,19 +115,8 @@
         android:layout_marginLeft="8dp"
         android:text="Sampler Name:"
         android:textSize="18sp"
-        app:layout_constraintBaseline_toBaselineOf="@+id/samplerNameBox"
+        app:layout_constraintBaseline_toBaselineOf="@+id/expectedSamplesBox"
         app:layout_constraintStart_toStartOf="parent" />
-
-    <android.support.v7.widget.AppCompatImageView
-        android:id="@+id/imageView"
-        android:layout_width="0dp"
-        android:layout_height="150dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/downSampButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/radioGroup" />
 
     <TextView
         android:id="@+id/timeCreatedTextView"
@@ -150,19 +143,94 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="34dp"
+        android:layout_marginTop="30dp"
         android:text="Facility: "
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView3" />
+        app:layout_constraintTop_toBottomOf="@+id/textView11" />
 
     <Spinner
-        android:id="@+id/spinner2"
+        android:id="@+id/facilitySpinner"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="30dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/samplerNameBox" />
+        app:layout_constraintStart_toStartOf="@+id/volumeText"
+        app:layout_constraintTop_toBottomOf="@+id/testCodeSpinner" />
+
+    <EditText
+        android:id="@+id/volumeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:ems="10"
+        android:hint="Volume (mL)"
+        android:inputType="number"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sampleNumText" />
+
+    <TextView
+        android:id="@+id/voltextview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="Volume (mL):"
+        android:textSize="18sp"
+        app:layout_constraintBaseline_toBaselineOf="@+id/volumeText"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <EditText
+        android:id="@+id/sampleNumText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:ems="10"
+        android:hint="Expected # of Samples"
+        android:inputType="number"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/expectedSamplesBox" />
+
+    <TextView
+        android:id="@+id/textView8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="Expected # of Samples:"
+        android:textSize="18sp"
+        app:layout_constraintBaseline_toBaselineOf="@+id/sampleNumText"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/textView11"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="30dp"
+        android:text="Test code:"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView12" />
+
+    <TextView
+        android:id="@+id/textView12"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="30dp"
+        android:text="Biocide Type:"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/voltextview" />
+
+    <TextView
+        android:id="@+id/textView7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="30dp"
+        android:text="Analyte:"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView9" />
 
 </android.support.constraint.ConstraintLayout>

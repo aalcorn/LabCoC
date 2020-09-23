@@ -5,7 +5,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,7 +14,6 @@ import android.util.Base64;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -23,17 +21,15 @@ import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
     public String sampName;
     public String samplerName;
+    public String volume;
+    public String sampleNum;
     public String date;
     public String sampType;
     public String facilityID;
@@ -41,20 +37,22 @@ public class MainActivity extends AppCompatActivity {
 
     TextView sampNameText;
     TextView samplerNameText;
+    TextView volumeText;
+    TextView sampleNumText;
 
     TextView createdText;
     TextView editedText;
 
     //ImageView imageView;
 
-    RadioButton hpcButton;
-    RadioButton legionellaButton;
-
     Button button;
     Button editButton;
     Button delButton;
 
-    Spinner spinner;
+    Spinner facilitySpinner;
+    Spinner biocideSpinner;
+    Spinner testCodeSpinner;
+    Spinner analyteSpinner;
 
     boolean edited = false;
     boolean complete = true;
@@ -68,10 +66,10 @@ public class MainActivity extends AppCompatActivity {
         final JSONArray jArr = ((MyApplication) getApplication()).mainArray;
         final JSONArray fArr = ((MyApplication) getApplication()).facilitiesArray;
 
-        hpcButton = findViewById(R.id.hpcButton);
-        legionellaButton = findViewById(R.id.legionButton);
         sampNameText = findViewById(R.id.nameBox);
-        samplerNameText = findViewById(R.id.samplerNameBox);
+        samplerNameText = findViewById(R.id.expectedSamplesBox);
+        volumeText = findViewById(R.id.volumeText);
+        sampleNumText = findViewById(R.id.sampleNumText);
         button = findViewById(R.id.downSampButton);
         button.setEnabled(false);
         delButton = findViewById(R.id.mainDelButton);
@@ -102,12 +100,28 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        spinner = findViewById(R.id.spinner2);
+        facilitySpinner = findViewById(R.id.facilitySpinner);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, array);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
+        facilitySpinner.setAdapter(adapter);
 
-        Drawable d = spinner.getBackground().getCurrent();
+        final String[] biocideArray = {"None", "Free Chlorine","Total Chlorine", "Monochloramine", "Copper/Silver", "Chlorine Dioxide"};
+        biocideSpinner = findViewById(R.id.BiocideSpinner);
+        ArrayAdapter<String> biocideAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, biocideArray);
+        biocideAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        biocideSpinner.setAdapter(biocideAdapter);
+
+        final String[] testCodeArray = {"H100","L100"};
+        testCodeSpinner = findViewById(R.id.testCodeSpinner);
+        ArrayAdapter<String> testCodeAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, testCodeArray);
+        testCodeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        testCodeSpinner.setAdapter(testCodeAdapter);
+
+        final String[] analyteArray = {"HPC","Legionella", "Coliform", "Lead", "Copper", "Disinfection", "Ionic"};
+        analyteSpinner = findViewById(R.id.analyteSpinner);
+        ArrayAdapter<String> analyteAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, analyteArray);
+        analyteAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        analyteSpinner.setAdapter(analyteAdapter);
 
         //if the event has previous data, fill the textboxes with it and don't allow them to edit it unless they hit edit
 
@@ -122,17 +136,15 @@ public class MainActivity extends AppCompatActivity {
                 edited = true;
                 samplerNameText.setFocusable(false);
             }
-
-            if(jArr.getJSONObject(eventID).has("type")) {
-                if(jArr.getJSONObject(eventID).get("type").equals("hpc")) {
-                    hpcButton.setChecked(true);
-                    legionellaButton.setEnabled(false);
-                }
-                else {
-                    legionellaButton.setChecked(true);
-                    hpcButton.setEnabled(false);
-                }
+            if(jArr.getJSONObject(eventID).has("volume")) {
+                volumeText.setText(jArr.getJSONObject(eventID).getString("volume"));
                 edited = true;
+                volumeText.setFocusable(false);
+            }
+            if(jArr.getJSONObject(eventID).has("anticipatedSamples")) {
+                sampleNumText.setText(jArr.getJSONObject(eventID).getString("anticipatedSamples"));
+                edited = true;
+                sampleNumText.setFocusable(false);
             }
 
             if (jArr.getJSONObject(eventID).has("facilityID")) {
@@ -141,26 +153,60 @@ public class MainActivity extends AppCompatActivity {
                     System.out.println(fArr.getJSONObject(i).getString("_id") + " Fac ID facArray");
                     System.out.println("Loop");
                     if(jArr.getJSONObject(eventID).getString("facilityID").equals(fArr.getJSONObject(i).getString("_id"))) {
-                        spinner.setSelection(i);
-                        spinner.setEnabled(false);
-                        spinner.setBackgroundDrawable(d);
+                        facilitySpinner.setSelection(i);
+                        facilitySpinner.setEnabled(false);
                         edited = true;
                         System.out.println(jArr.getJSONObject(eventID).getString("facilityID") + " if statement");
                     }
                 }
             }
-            /*if(jArr.getJSONObject(eventID).has("signature")) {
-                imageView = findViewById(R.id.imageView);
-                Bitmap bitmap = StringToBitMap(jArr.getJSONObject(eventID).getString("signature"));
-                imageView.setBackgroundColor(Color.parseColor("#d6d6d6"));
-                imageView.setImageBitmap(bitmap);
-            }*/
+
+            if(jArr.getJSONObject(eventID).has("biocide")) {
+                for(int i = 0; i < biocideArray.length; i++) {
+                    String appBiocide = biocideArray[i].toLowerCase();
+                    String jsonBiocide = jArr.getJSONObject(eventID).get("biocide").toString().toLowerCase();
+                    if(appBiocide.equals(jsonBiocide)) {
+                        biocideSpinner.setSelection(i);
+                        biocideSpinner.setEnabled(false);
+                        System.out.println("Found Biocide!");
+                        edited = true;
+                    }
+                }
+            }
+
+            if(jArr.getJSONObject(eventID).has("testCode")) {
+                for(int i = 0; i < testCodeArray.length; i++) {
+                    if(testCodeArray[i].equals(jArr.getJSONObject(eventID).get("testCode"))) {
+                        testCodeSpinner.setSelection(i);
+                        testCodeSpinner.setEnabled(false);
+                        System.out.println("Found Test Code!");
+                        edited = true;
+                    }
+                }
+            }
+
+            if(jArr.getJSONObject(eventID).has("type")) {
+                for(int i = 0; i < analyteArray.length; i++) {
+                    String appAnalyte = analyteArray[i].toLowerCase();
+                    String jsonAnalyte = jArr.getJSONObject(eventID).get("type").toString().toLowerCase();
+                    System.out.println(appAnalyte);
+                    System.out.println(jsonAnalyte);
+                    if(appAnalyte.equals(jsonAnalyte)) {
+                        analyteSpinner.setSelection(i);
+                        analyteSpinner.setEnabled(false);
+                        System.out.println("Found analyte!");
+                        edited = true;
+                    }
+                }
+            }
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
         sampNameText.addTextChangedListener(textWatcher);
         samplerNameText.addTextChangedListener(textWatcher);
-
+        volumeText.addTextChangedListener(textWatcher);
+        sampleNumText.addTextChangedListener(textWatcher);
 
         if(edited && complete) {
             button.setText("View Samples");
@@ -175,19 +221,19 @@ public class MainActivity extends AppCompatActivity {
                         button.setEnabled(true);
                         sampName = sampNameText.getText().toString();
                         samplerName = samplerNameText.getText().toString();
-                        spinner.setEnabled(true);
-                        System.out.println("Position: " + spinner.getSelectedItemPosition());
+                        volume = volumeText.getText().toString();
+                        sampleNum = sampleNumText.getText().toString();
+
+                        facilitySpinner.setEnabled(true);
+                        biocideSpinner.setEnabled(true);
+                        testCodeSpinner.setEnabled(true);
+                        analyteSpinner.setEnabled(true);
+                        System.out.println("Position: " + facilitySpinner.getSelectedItemPosition());
                         System.out.println("fArr: " + fArr.toString());
                         try {
-                            facilityID = fArr.getJSONObject(spinner.getSelectedItemPosition()).getString("_id");
+                            facilityID = fArr.getJSONObject(facilitySpinner.getSelectedItemPosition()).getString("_id");
                         } catch (JSONException e) {
                             e.printStackTrace();
-                        }
-                        if (hpcButton.isChecked()) {
-                            sampType = "hpc";
-                        }
-                        else {
-                            sampType = "legionella";
                         }
 
                         Date dateobj = new Date();
@@ -196,9 +242,13 @@ public class MainActivity extends AppCompatActivity {
                             jArr.getJSONObject(eventID).put("name", sampName);
                             jArr.getJSONObject(eventID).put("samplerName", samplerName);
                             jArr.getJSONObject(eventID).put("samplingDate", dateobj);
-                            jArr.getJSONObject(eventID).put("type", sampType);
+                            jArr.getJSONObject(eventID).put("type", analyteArray[analyteSpinner.getSelectedItemPosition()]);
                             jArr.getJSONObject(eventID).put("facilityID", facilityID);
                             jArr.getJSONObject(eventID).put("completed", true);
+                            jArr.getJSONObject(eventID).put("volume", volume);
+                            jArr.getJSONObject(eventID).put("anticipatedSamples", sampleNum);
+                            jArr.getJSONObject(eventID).put("biocide", biocideArray[biocideSpinner.getSelectedItemPosition()]);
+                            jArr.getJSONObject(eventID).put("testCode", testCodeArray[testCodeSpinner.getSelectedItemPosition()]);
                             if (!jArr.getJSONObject(eventID).has("samples") ) {
                                 System.out.println("adding samples array");
                                 jArr.getJSONObject(eventID).put("samples", new JSONArray());
@@ -266,26 +316,32 @@ public class MainActivity extends AppCompatActivity {
                         sampNameText.setFocusableInTouchMode(true);
                         samplerNameText.setFocusable(true);
                         samplerNameText.setFocusableInTouchMode(true);
-                        hpcButton.setEnabled(true);
-                        legionellaButton.setEnabled(true);
-                        spinner.setEnabled(true);
+                        volumeText.setFocusable(true);
+                        volumeText.setFocusableInTouchMode(true);
+                        sampleNumText.setFocusable(true);
+                        sampleNumText.setFocusableInTouchMode(true);
+                        facilitySpinner.setEnabled(true);
+                        biocideSpinner.setEnabled(true);
+                        testCodeSpinner.setEnabled(true);
+                        analyteSpinner.setEnabled(true);
 
                         editButton.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 sampName = sampNameText.getText().toString();
                                 samplerName = samplerNameText.getText().toString();
-                                spinner.setEnabled(true);
+                                volume = volumeText.getText().toString();
+                                sampleNum = sampleNumText.getText().toString();
+
+                                facilitySpinner.setEnabled(true);
+                                biocideSpinner.setEnabled(true);
+                                testCodeSpinner.setEnabled(true);
+                                analyteSpinner.setEnabled(true);
+
                                 try {
-                                    facilityID = fArr.getJSONObject(spinner.getSelectedItemPosition()).getString("_id");
+                                    facilityID = fArr.getJSONObject(facilitySpinner.getSelectedItemPosition()).getString("_id");
                                 } catch (JSONException e) {
                                     e.printStackTrace();
-                                }
-                                if (hpcButton.isChecked()) {
-                                    sampType = "hpc";
-                                }
-                                else {
-                                    sampType = "legionella";
                                 }
 
                                 Date dateobj = new Date();
@@ -293,9 +349,14 @@ public class MainActivity extends AppCompatActivity {
                                 try {
                                     jArr.getJSONObject(eventID).put("name", sampName);
                                     jArr.getJSONObject(eventID).put("samplerName", samplerName);
-                                    jArr.getJSONObject(eventID).put("type", sampType);
+                                    jArr.getJSONObject(eventID).put("type", analyteArray[analyteSpinner.getSelectedItemPosition()]);
                                     jArr.getJSONObject(eventID).put("editDate", dateobj);
                                     jArr.getJSONObject(eventID).put("facilityID", facilityID);
+                                    jArr.getJSONObject(eventID).put("completed", true);
+                                    jArr.getJSONObject(eventID).put("volume", volume);
+                                    jArr.getJSONObject(eventID).put("anticipatedSamples", sampleNum);
+                                    jArr.getJSONObject(eventID).put("biocide", biocideArray[biocideSpinner.getSelectedItemPosition()]);
+                                    jArr.getJSONObject(eventID).put("testCode", testCodeArray[testCodeSpinner.getSelectedItemPosition()]);
                                     if (!jArr.getJSONObject(eventID).has("samples") ) {
                                         System.out.println("adding samples array");
                                         jArr.getJSONObject(eventID).put("samples", new JSONArray());
@@ -318,33 +379,6 @@ public class MainActivity extends AppCompatActivity {
 
 
             }
-
-        hpcButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                sampName = sampNameText.getText().toString();
-                samplerName = samplerNameText.getText().toString();
-
-                System.out.println(hpcButton.isChecked());
-                System.out.println(legionellaButton.isChecked());
-
-                button.setEnabled(!sampName.isEmpty() && !samplerName.isEmpty() && (hpcButton.isChecked() || legionellaButton.isChecked()));
-            }
-        });
-
-        legionellaButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                sampName = sampNameText.getText().toString();
-                samplerName = samplerNameText.getText().toString();
-
-                System.out.println(hpcButton.isChecked());
-                System.out.println(legionellaButton.isChecked());
-
-                button.setEnabled(!sampName.isEmpty() && !samplerName.isEmpty() && (hpcButton.isChecked() || legionellaButton.isChecked()));
-            }
-        });
-
 
         createdText = findViewById(R.id.timeEditedText);
         editedText = findViewById(R.id.timeCreatedTextView);
@@ -370,12 +404,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
-            sampName = sampNameText.getText().toString();
-            samplerName = samplerNameText.getText().toString();
-
-            if(!edited || !complete) {
-                button.setEnabled(!sampName.isEmpty() && !samplerName.isEmpty() && (hpcButton.isChecked() || legionellaButton.isChecked()));
-            }
+            checkButton();
         }
 
         @Override
@@ -383,6 +412,18 @@ public class MainActivity extends AppCompatActivity {
 
         }
     };
+
+    public void checkButton() {
+        sampName = sampNameText.getText().toString();
+        samplerName = samplerNameText.getText().toString();
+        volume = volumeText.getText().toString();
+        sampleNum = sampleNumText.getText().toString();
+
+        if(!edited || !complete) {
+            button.setEnabled(!sampleNum.isEmpty() && !volume.isEmpty() && !sampName.isEmpty() && !samplerName.isEmpty());
+        }
+        editButton.setEnabled(!sampleNum.isEmpty() && !volume.isEmpty() && !sampName.isEmpty() && !samplerName.isEmpty());
+    }
 
     public Bitmap StringToBitMap(String encodedString) {
         try {

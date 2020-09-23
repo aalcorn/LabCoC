@@ -18,21 +18,24 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 
-public class signActivity extends AppCompatActivity {
+public class signActivity extends AppCompatActivity implements infoEntry.InfoEntryListener {
 
     Button confButton;
     Button clearButton;
     Bitmap btm;
     GestureOverlayView gv;
+    JSONArray sendArray;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,18 +84,35 @@ public class signActivity extends AppCompatActivity {
                 btm = Bitmap.createBitmap(gv.getDrawingCache());
                 gv.setDrawingCacheEnabled(false);
 
-                String bitmapString = BitMapToString(btm);
+                System.out.println(btm.getHeight());
+                System.out.println(btm.getWidth());
+
+                Bitmap scaledBitMap = Bitmap.createScaledBitmap(btm, 300,300, true);
+
+                System.out.println(scaledBitMap.getHeight());
+                System.out.println(scaledBitMap.getWidth());
+
+                String bitmapString = BitMapToString(scaledBitMap);
 
                 final JSONArray jArr = ((MyApplication) getApplication()).mainArray;
 
-                jArr.put(new JSONObject());
                 try {
-                    jArr.getJSONObject(jArr.length()-1).put("bitmap", bitmapString);
+                    sendArray = new JSONArray(jArr.toString());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                sendArray.put(new JSONObject());
+                try {
+                    sendArray.getJSONObject(sendArray.length() - 1).put("bitmap", bitmapString);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
 
-                postJson();
+                //postJson(sendArray);
+
+                //login();
+
+                openDialog();
 
             }
 
@@ -122,7 +142,7 @@ public class signActivity extends AppCompatActivity {
         return temp;
     }
 
-    public void postJson() {
+    public void postJson(final JSONArray theArray, final String email, final String password) {
         //do a POST to josh's server
         Thread thread = new Thread(new Runnable() {
             @Override
@@ -132,20 +152,22 @@ public class signActivity extends AppCompatActivity {
                 InputStream stream = null;
                 try {
                     //Post to sampling app URL
-                    url = new URL("REDACTED");
+                    url = new URL("http://69.92.212.4/sampling/app");
                     connection = (HttpURLConnection) url.openConnection();
                     connection.setRequestMethod("POST");
                     connection.setDoOutput(true);
                     connection.setDoInput(true);
+                    connection.setConnectTimeout(10000);
+                    connection.setReadTimeout(10000);
 
-                    final JSONArray jArr = ((MyApplication) getApplication()).mainArray;
+                    String data = URLEncoder.encode("data", "UTF-8") + "=" + URLEncoder.encode(theArray.toString(), "UTF-8");
+                    data += "&" + URLEncoder.encode("email", "UTF-8") + "=" + URLEncoder.encode(email, "UTF-8");
+                    //password = URLEncoder.encode("password", "UTF-8") + "=" + URLEncoder.encode(info.get("password").toString(), "UTF-8");
+                    data += "&" + URLEncoder.encode("password","UTF-8") + "=" + URLEncoder.encode(password,"UTF-8");
 
-                    String data = URLEncoder.encode("data", "UTF-8") + "=" + URLEncoder.encode(jArr.toString(), "UTF-8");
-
-                    System.out.println(jArr.toString());
+                    System.out.println(theArray.toString());
 
                     connection.connect();
-
 
                     OutputStreamWriter wr = new OutputStreamWriter(connection.getOutputStream());
                     wr.write(data);
@@ -153,18 +175,29 @@ public class signActivity extends AppCompatActivity {
 
                     int responseCode = connection.getResponseCode();
 
-                    if(responseCode == 500) {
+                    if(responseCode == 413) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(signActivity.this,"Signature size too big!", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+
+                    else if(responseCode == 500) {
                         try
                         {
                             String line;
                             BufferedReader bufferedReader = new BufferedReader( new InputStreamReader( connection.getErrorStream() ) );
                             while( (line = bufferedReader.readLine()) != null )
                             {
+                                //System.out.println("Input Stream: ");
                                 System.out.printf("%s\n", line);
                             }
                         }
                         catch( IOException e )
                         {
+                            //System.out.println("Error! ");
                             System.err.println( "Error: " + e );
                         }
                     }
@@ -185,7 +218,7 @@ public class signActivity extends AppCompatActivity {
 
                     //CLEAR IF GOOD RESULT
 
-                    ((MyApplication) getApplication()).clearJson();
+                    //((MyApplication) getApplication()).clearJson();
 
                     Intent intent = new Intent(signActivity.this, selectActivity.class);
                     startActivity(intent);
@@ -218,4 +251,13 @@ public class signActivity extends AppCompatActivity {
         thread.start();
     }
 
+    public void openDialog() {
+        infoEntry infoEntry = new infoEntry();
+        infoEntry.show(getSupportFragmentManager(), "Info Entry Dialog");
+    }
+
+    @Override
+    public void onRecieveInfo(String email, String password) {
+        postJson(sendArray, email, password);
+    }
 }
