@@ -161,10 +161,10 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
-            if(jArr.getJSONObject(eventID).has("biocide")) {
+            if(jArr.getJSONObject(eventID).has("biocideType")) {
                 for(int i = 0; i < biocideArray.length; i++) {
                     String appBiocide = biocideArray[i].toLowerCase();
-                    String jsonBiocide = jArr.getJSONObject(eventID).get("biocide").toString().toLowerCase();
+                    String jsonBiocide = jArr.getJSONObject(eventID).get("biocideType").toString().toLowerCase();
                     if(appBiocide.equals(jsonBiocide)) {
                         biocideSpinner.setSelection(i);
                         biocideSpinner.setEnabled(false);
@@ -189,8 +189,6 @@ public class MainActivity extends AppCompatActivity {
                 for(int i = 0; i < analyteArray.length; i++) {
                     String appAnalyte = analyteArray[i].toLowerCase();
                     String jsonAnalyte = jArr.getJSONObject(eventID).get("type").toString().toLowerCase();
-                    System.out.println(appAnalyte);
-                    System.out.println(jsonAnalyte);
                     if(appAnalyte.equals(jsonAnalyte)) {
                         analyteSpinner.setSelection(i);
                         analyteSpinner.setEnabled(false);
@@ -247,7 +245,7 @@ public class MainActivity extends AppCompatActivity {
                             jArr.getJSONObject(eventID).put("completed", true);
                             jArr.getJSONObject(eventID).put("volume", volume);
                             jArr.getJSONObject(eventID).put("anticipatedSamples", sampleNum);
-                            jArr.getJSONObject(eventID).put("biocide", biocideArray[biocideSpinner.getSelectedItemPosition()]);
+                            jArr.getJSONObject(eventID).put("biocideType", biocideArray[biocideSpinner.getSelectedItemPosition()]);
                             jArr.getJSONObject(eventID).put("testCode", testCodeArray[testCodeSpinner.getSelectedItemPosition()]);
                             if (!jArr.getJSONObject(eventID).has("samples") ) {
                                 System.out.println("adding samples array");
@@ -355,7 +353,7 @@ public class MainActivity extends AppCompatActivity {
                                     jArr.getJSONObject(eventID).put("completed", true);
                                     jArr.getJSONObject(eventID).put("volume", volume);
                                     jArr.getJSONObject(eventID).put("anticipatedSamples", sampleNum);
-                                    jArr.getJSONObject(eventID).put("biocide", biocideArray[biocideSpinner.getSelectedItemPosition()]);
+                                    jArr.getJSONObject(eventID).put("biocideType", biocideArray[biocideSpinner.getSelectedItemPosition()]);
                                     jArr.getJSONObject(eventID).put("testCode", testCodeArray[testCodeSpinner.getSelectedItemPosition()]);
                                     if (!jArr.getJSONObject(eventID).has("samples") ) {
                                         System.out.println("adding samples array");

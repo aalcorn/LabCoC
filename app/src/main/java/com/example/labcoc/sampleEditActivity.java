@@ -9,11 +9,13 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -60,6 +62,8 @@ public class sampleEditActivity extends AppCompatActivity {
     int sID; //The place of the sample in the sampling event's sample array
     boolean edited = false;
     boolean isLegionella;
+
+    final String[] hotColdArray = {"Cold","Hot", "Mixed"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,10 +129,22 @@ public class sampleEditActivity extends AppCompatActivity {
         faucetAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         faucetTypeSpinner.setAdapter(faucetAdapter);
 
-        final String[] hotColdArray = {"Cold","Hot", "Mixed"};
+        //final String[] hotColdArray = {"Cold","Hot", "Mixed"};
         final ArrayAdapter<String> hotColdAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, hotColdArray);
         hotColdAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         hotColdSpinner.setAdapter(hotColdAdapter);
+
+        hotColdSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                checkInputValidity();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
 
         //Comment button setup
@@ -446,19 +462,53 @@ public class sampleEditActivity extends AppCompatActivity {
 
         @Override
         public void afterTextChanged(Editable s) {
-            if (!phText.getText().toString().isEmpty() && !phText.getText().toString().equals(".")) {
-                Double phDub = Double.parseDouble(phText.getText().toString());
-                if (phDub < 0 || phDub > 14) {
-                    phText.setTextColor(Color.RED);
-                }
-                else {
-                    phText.setTextColor(Color.BLACK);
-                }
+            checkInputValidity();
+        }
+    };
 
+    public void checkInputValidity() {
+        if (!phText.getText().toString().isEmpty() && !phText.getText().toString().equals(".")) {
+            Double phDub = Double.parseDouble(phText.getText().toString());
+            if (phDub < 0 || phDub > 14) {
+                phText.setTextColor(Color.RED);
+            }
+            else {
+                phText.setTextColor(Color.BLACK);
             }
 
         }
-    };
+
+        if (!tempText.getText().toString().isEmpty() && !tempText.getText().toString().equals(".")) {
+            String hotColdString = hotColdArray[hotColdSpinner.getSelectedItemPosition()];
+            Double tempDub = Double.parseDouble(tempText.getText().toString());
+            switch (hotColdString) {
+                case "Cold":
+                    if(tempDub > 85 || tempDub < 65) {
+                        tempText.setTextColor(Color.RED);
+                    }
+                    else {
+                        tempText.setTextColor(Color.BLACK);
+                    }
+                    break;
+                case "Hot":
+                    if (tempDub > 110 || tempDub < 87) {
+                        tempText.setTextColor(Color.RED);
+                    }
+                    else {
+                        tempText.setTextColor(Color.BLACK);
+                    }
+                    break;
+                case "Mixed":
+                    if (tempDub > 110) {
+                        tempText.setTextColor(Color.RED);
+                    }
+                    else {
+                        tempText.setTextColor(Color.BLACK);
+                    }
+                    break;
+            }
+        }
+    }
 
     public void onBackPressed() {
         Intent intent = new Intent(sampleEditActivity.this, samplesActivity.class);

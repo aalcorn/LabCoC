@@ -17,6 +17,9 @@ public class downloadsShowActivity extends AppCompatActivity {
     EditText expectedSamplesBox;
     EditText facilityText;
     EditText analyteText;
+    EditText biocideText;
+    EditText testCodeText;
+    EditText volumeText;
 
     Button downloadButton;
 
@@ -41,6 +44,9 @@ public class downloadsShowActivity extends AppCompatActivity {
         expectedSamplesBox = findViewById(R.id.expectedSamplesBox);
         facilityText = findViewById(R.id.facilityText);
         analyteText = findViewById(R.id.analyteText);
+        biocideText = findViewById(R.id.downloadBiocideEditText);
+        testCodeText = findViewById(R.id.downloadTestCodeEditText);
+        volumeText = findViewById(R.id.downloadVolumeEditText);
 
         try {
             nameBox.setText(dArr.getJSONObject(eventID).getString("name"));
@@ -52,6 +58,9 @@ public class downloadsShowActivity extends AppCompatActivity {
             }
 
             analyteText.setText(dArr.getJSONObject(eventID).getString("type"));
+            biocideText.setText(dArr.getJSONObject(eventID).getString("biocideType"));
+            testCodeText.setText(dArr.getJSONObject(eventID).getString("testCode"));
+            volumeText.setText(dArr.getJSONObject(eventID).getString("volume"));
 
             for (int i = 0; i < fArr.length(); i++) {
                 System.out.println(dArr.getJSONObject(eventID).getString("facilityID") + "down");
@@ -69,6 +78,9 @@ public class downloadsShowActivity extends AppCompatActivity {
         expectedSamplesBox.setFocusable(false);
         facilityText.setFocusable(false);
         analyteText.setFocusable(false);
+        biocideText.setFocusable(false);
+        testCodeText.setFocusable(false);
+        volumeText.setFocusable(false);
 
         downloadButton.setOnClickListener(new View.OnClickListener() {
             @Override
