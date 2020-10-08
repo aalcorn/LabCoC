@@ -15,7 +15,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,7 +25,10 @@ import java.util.Date;
 
 public class sampleEditActivity extends AppCompatActivity {
 
-    TextView sampleLocText;
+    TextView buildingText;
+    TextView floorText;
+    TextView roomText;
+
     TextView tempText;
     TextView bioCideText;
     TextView phText;
@@ -78,7 +80,10 @@ public class sampleEditActivity extends AppCompatActivity {
 
         sampleNumber = getIntent().getExtras().getInt("completedSamplesCount") + 1;
 
-        sampleLocText = findViewById(R.id.SampleLocText);
+        buildingText = findViewById(R.id.buildingText);
+        floorText = findViewById(R.id.floorText);
+        roomText = findViewById(R.id.roomText);
+
         tempText = findViewById(R.id.tempText);
         bioCideText = findViewById(R.id.bioText);
         phText = findViewById(R.id.pHText);
@@ -182,12 +187,49 @@ public class sampleEditActivity extends AppCompatActivity {
             }
         });
 
+        //Delete button setup
+        delButton = findViewById(R.id.sampleDeleteButton);
+        delButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //pop up a window that asks if they're sure they want to delete; if they are, add delete flag to the sample
+                new AlertDialog.Builder(sampleEditActivity.this)
+                        .setTitle("")
+                        .setMessage("Delete this sample?")
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Toast.makeText(sampleEditActivity.this,"Deleted", Toast.LENGTH_LONG).show();
+                                try {
+                                    jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("deleted", true);
+                                    Intent intent = new Intent(sampleEditActivity.this, samplesActivity.class);
+                                    intent.putExtra("eventID", eventID);
+                                    ((MyApplication) getApplication()).saveJson();
+                                    startActivity(intent);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        })
+
+                        .setNegativeButton(android.R.string.no, null).show();
+            }
+        });
+
         try {
             //update fields pertaining to both legionella and HPC
             if(jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).has("sampleLocation")) {
                 if (!jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).getString("sampleLocation").equals("")) {
-                    sampleLocText.setText(jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).getString("sampleLocation"));
-                    sampleLocText.setFocusable(false);
+                    String[] locationArray = jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).getString("sampleLocation").split(" ");
+                    buildingText.setText(locationArray[1]);
+                    floorText.setText(locationArray[2]);
+                    roomText.setText(locationArray[5]);
+
+                    buildingText.setFocusable(false);
+                    floorText.setFocusable(false);
+                    roomText.setFocusable(false);
+
                 }
             }
             if (jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).has("potable")) {
@@ -243,14 +285,15 @@ public class sampleEditActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        sampleLocText.addTextChangedListener(textWatcher);
+        buildingText.addTextChangedListener(textWatcher);
+        floorText.addTextChangedListener(textWatcher);
+        roomText.addTextChangedListener(textWatcher);
         if(isLegionella) {
             tempText.addTextChangedListener(textWatcher);
             bioCideText.addTextChangedListener(textWatcher);
             phText.addTextChangedListener(textWatcher);
         }
 
-        delButton = findViewById(R.id.sampleDeleteButton);
         button = findViewById(R.id.sampConfButton);
         button.setEnabled(false);
         try {
@@ -261,8 +304,6 @@ public class sampleEditActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        delButton.setVisibility(View.INVISIBLE);
-        delButton.setEnabled(false);
 
         if(edited) {
             button.setText("EDIT");
@@ -274,8 +315,7 @@ public class sampleEditActivity extends AppCompatActivity {
             public void onClick(View v) {
                 //add sample params to array and go back to sampling event page corresponding to this sample
                 if(!edited) {
-
-                    sampleLoc = sampleLocText.getText().toString();
+                    sampleLoc = ("Building " + buildingText.getText().toString() + " " + floorText.getText().toString() + " Floor Room " + roomText.getText().toString());
 
                     Date dateObj = new Date();
 
@@ -312,8 +352,12 @@ public class sampleEditActivity extends AppCompatActivity {
                     button.setText("confirm");
 
 
-                    sampleLocText.setFocusable(true);
-                    sampleLocText.setFocusableInTouchMode(true);
+                    buildingText.setFocusable(true);
+                    buildingText.setFocusableInTouchMode(true);
+                    floorText.setFocusable(true);
+                    floorText.setFocusableInTouchMode(true);
+                    roomText.setFocusable(true);
+                    roomText.setFocusableInTouchMode(true);
                     potableBox.setEnabled(true);
 
                     if(isLegionella) {
@@ -334,8 +378,7 @@ public class sampleEditActivity extends AppCompatActivity {
                     button.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-
-                            sampleLoc = sampleLocText.getText().toString();
+                            sampleLoc = ("Building " + buildingText.getText().toString() + " " + floorText.getText().toString() + " Floor Room " + roomText.getText().toString());
 
                             Date dateObj = new Date();
 
@@ -368,39 +411,6 @@ public class sampleEditActivity extends AppCompatActivity {
 
                         }
                     });
-
-                    //activation of delete button here
-                    delButton.setEnabled(true);
-                    delButton.setVisibility(View.VISIBLE);
-
-                    delButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            //pop up a window that asks if they're sure they want to delete; if they are, add delete flag to the sample
-                            new AlertDialog.Builder(sampleEditActivity.this)
-                                    .setTitle("")
-                                    .setMessage("Delete this sample?")
-                                    .setIcon(android.R.drawable.ic_dialog_alert)
-                                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            Toast.makeText(sampleEditActivity.this,"Deleted", Toast.LENGTH_LONG).show();
-                                            try {
-                                                jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(sID).put("deleted", true);
-                                                Intent intent = new Intent(sampleEditActivity.this, samplesActivity.class);
-                                                intent.putExtra("eventID", eventID);
-                                                ((MyApplication) getApplication()).saveJson();
-                                                startActivity(intent);
-                                            } catch (JSONException e) {
-                                                e.printStackTrace();
-                                            }
-                                        }
-                                    })
-
-                                    .setNegativeButton(android.R.string.no, null).show();
-                        }
-                    });
-
 
                 }
 
@@ -444,18 +454,21 @@ public class sampleEditActivity extends AppCompatActivity {
         //sets the confirmation button clickable only if all fields are filled in
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
-            sampleLoc = sampleLocText.getText().toString();
+
+            String building = buildingText.getText().toString();
+            String floor = floorText.getText().toString();
+            String room = roomText.getText().toString();
 
             if(isLegionella) {
                 temp = tempText.getText().toString();
                 biocide = bioCideText.getText().toString();
                 ph = phText.getText().toString();
 
-                button.setEnabled(!sampleLoc.isEmpty() && !temp.isEmpty() && !biocide.isEmpty() && !ph.isEmpty());
+                button.setEnabled(!temp.isEmpty() && !biocide.isEmpty() && !ph.isEmpty() && !building.isEmpty() && !floor.isEmpty() && !room.isEmpty());
 
             }
             else {
-                button.setEnabled(!sampleLoc.isEmpty());
+                button.setEnabled(!building.isEmpty() && !floor.isEmpty() && !room.isEmpty());
             }
 
         }
@@ -499,7 +512,7 @@ public class sampleEditActivity extends AppCompatActivity {
                     }
                     break;
                 case "Mixed":
-                    if (tempDub > 110) {
+                    if (tempDub > 110 || tempDub < 65) {
                         tempText.setTextColor(Color.RED);
                     }
                     else {

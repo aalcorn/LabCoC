@@ -1,6 +1,7 @@
 package com.example.labcoc;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.gesture.GestureOverlayView;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -218,7 +219,10 @@ public class signActivity extends AppCompatActivity implements infoEntry.InfoEnt
 
                     //CLEAR IF GOOD RESULT
 
-                    //((MyApplication) getApplication()).clearJson();
+                    if (result.equals("SAMPLE EVENT REGISTRATION COMPLETE")) {
+                        ((MyApplication) getApplication()).clearJson();
+                        System.out.println("Deleting array");
+                    }
 
                     Intent intent = new Intent(signActivity.this, selectActivity.class);
                     startActivity(intent);

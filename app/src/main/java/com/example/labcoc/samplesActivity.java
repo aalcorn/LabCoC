@@ -21,6 +21,7 @@ public class samplesActivity extends AppCompatActivity {
     private Button button;
     private int samplesCount;
     private int completeSamplesCount;
+    private int completeDeletedSamplesCount;
     TextView eventNameText;
     TextView sampleCounterText;
     Button backButton;
@@ -60,29 +61,33 @@ public class samplesActivity extends AppCompatActivity {
         //populate list with all previous samples (This will be done by going to the index of the sampling event and looking at the length of the samples array)
 
         completeSamplesCount = 0;
+        completeDeletedSamplesCount = 0;
         for(int i = 1; i <= samplesCount; i++) {
             try {
-                if(!jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(i-1).has("deleted")) {
-                    Button myButton = new Button(samplesActivity.this);
-                    if (jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(i-1).has("sampleLocation") && jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(i-1).has("sampleNumber") ) {
-                        myButton.setText("Sample #"+ jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(i-1).get("sampleNumber") + ": " + jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(i-1).get("sampleLocation"));
-                    }
-                    else if (jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(i-1).has("sampleLocation")) {
-                        myButton.setText(jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(i-1).get("sampleLocation").toString());
-                    }
-                    else {
-                        myButton.setText("Unnamed Sample");
-                    }
-                    if (jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(i-1).has("time")) {
-                        completeSamplesCount++;
-                        myButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#43ba00")));
-                    }
 
-                    myButton.setId(i);
-                    final int id_ = myButton.getId();
+                Button myButton = new Button(samplesActivity.this);
+                if (jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(i - 1).has("sampleLocation") && jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(i - 1).has("sampleNumber")) {
+                    myButton.setText("Sample #" + jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(i - 1).get("sampleNumber") + ": " + jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(i - 1).get("sampleLocation"));
+                } else if (jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(i - 1).has("sampleLocation")) {
+                    myButton.setText(jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(i - 1).get("sampleLocation").toString());
+                } else {
+                    myButton.setText("Unnamed Sample");
+                }
+                if (jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(i - 1).has("time")) {
+                    completeSamplesCount++;
+                    if (jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(i - 1).has("deleted")) {
+                        completeDeletedSamplesCount++;
+                    }
+                    myButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#43ba00")));
+                }
 
-                    LinearLayout layout = findViewById(R.id.scrollLayout);
-                    layout.addView(myButton);
+                if (!jArr.getJSONObject(eventID).getJSONArray("samples").getJSONObject(i - 1).has("deleted")) {
+                myButton.setId(i);
+                final int id_ = myButton.getId();
+
+                LinearLayout layout = findViewById(R.id.scrollLayout);
+                layout.addView(myButton);
+
 
                     myButton.setOnClickListener(new View.OnClickListener() {
                         public void onClick(View view) {
@@ -103,7 +108,7 @@ public class samplesActivity extends AppCompatActivity {
         }
 
         try {
-            sampleCounterText.setText( completeSamplesCount + "/" + jArr.getJSONObject(eventID).get("anticipatedSamples") + " Samples Completed");
+            sampleCounterText.setText( (completeSamplesCount - completeDeletedSamplesCount) + "/" + jArr.getJSONObject(eventID).get("anticipatedSamples") + " Samples Completed");
         } catch (JSONException e) {
             e.printStackTrace();
         }
